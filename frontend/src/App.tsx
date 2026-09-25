@@ -14,6 +14,8 @@ import { SearchModal } from './components/modals/SearchModal';
 
 // Pages
 import HomePage from './pages/HomePage';
+import CollectionPage from './pages/CollectionPage';
+import ProductDetailPage from './pages/ProductDetailPage';
 
 function AppShell() {
   const location = useLocation();
@@ -31,6 +33,12 @@ function AppShell() {
       <main id="main-content" role="main" className="flex-1 w-full">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/collections/:handle" element={<CollectionPage />} />
+          <Route path="/products/:handle" element={<ProductDetailPage />} />
+          <Route
+            path="/collections/:collectionHandle/products/:handle"
+            element={<ProductDetailPage />}
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
