@@ -77,8 +77,11 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = new Product();
         product.setCategory(category);
-        product.setProductName(request.productName().trim());
-        product.setProductDescription(request.description());
+        // trim name and safely handle null description
+        String trimmedName = request.productName().trim();
+        String sanitizedDesc = (request.description() != null) ? request.description().trim() : null;
+        product.setProductName(trimmedName);
+        product.setProductDescription(sanitizedDesc);
         product.setGenderTarget(request.genderTarget());
         product.setBasePrice(request.basePrice());
         product.setMainImageUrl(request.mainImageUrl());
