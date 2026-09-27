@@ -54,8 +54,14 @@ public class CategoryServiceImpl implements CategoryService {
             return null;
         }
 
+        String trimmedName = request.categoryName().trim();
+        // check duplicate category name to prevent MySQL constraint crash
+        if (categoryRepository.existsByCategoryName(trimmedName)) {
+            return null;
+        }
+
         Category category = new Category();
-        category.setCategoryName(request.categoryName().trim());
+        category.setCategoryName(trimmedName);
         category.setCategoryDescription(request.description());
 
         Category saved = categoryRepository.save(category);
