@@ -45,6 +45,12 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+    // get variants for a product
+    @GetMapping("/{id}/variants")
+    public ResponseEntity<?> getVariantsByProduct(@PathVariable Integer id) {
+        return ResponseEntity.ok(productService.getProductById(id));
+    }
+
     // create a new product item
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody CreateProductRequest request) {
