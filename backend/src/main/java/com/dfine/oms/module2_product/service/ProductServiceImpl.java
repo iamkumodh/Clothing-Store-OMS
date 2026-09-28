@@ -2,8 +2,10 @@ package com.dfine.oms.module2_product.service;
 
 import com.dfine.oms.module2_product.dto.CreateProductRequest;
 import com.dfine.oms.module2_product.dto.ProductResponse;
+import com.dfine.oms.module2_product.dto.VariantDto;
 import com.dfine.oms.module2_product.entity.Category;
 import com.dfine.oms.module2_product.entity.Product;
+import com.dfine.oms.module2_product.entity.ProductVariant;
 import com.dfine.oms.module2_product.repository.CategoryRepository;
 import com.dfine.oms.module2_product.repository.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -100,6 +102,30 @@ public class ProductServiceImpl implements ProductService {
             catName = product.getCategory().getCategoryName();
         }
 
+        // calculate aggregate stock badge
+        int totalStock = 0;
+        boolean anyLowStock = false;
+        List<VariantDto> variantDtos = new ArrayList<>();
+
+        if (product.getVariants() != null) {
+            for (ProductVariant v : product.getVariants()) {
+                totalStock += v.getStockQuantity();
+                if (v.getStockQuantity() <= v.getLowStockThreshold() && v.getStockQuantity() > 0) {
+                    anyLowStock = true;
+                }
+                String itemStatus = (v.getStockQuantity() == 0) ? "OUT_OF_STOCK"
+                        : (v.getStockQuantity() <= v.getLowStockThreshold()) ? "LOW_STOCK" : "IN_STOCK";
+                variantDtos.add(new VariantDto(
+                        v.getVariantId(), v.getSku(), v.getSize(), v.getColor(),
+                        java.math.BigDecimal.ZERO, v.getStockQuantity(), v.getLowStockThreshold(), itemStatus));
+            }
+        }
+
+        String badge = "OUT_OF_STOCK";
+        if (totalStock > 0) {
+            badge = anyLowStock ? "LOW_STOCK" : "IN_STOCK";
+        }
+
         return new ProductResponse(
                 product.getProductId(),
                 catId,
@@ -109,7 +135,8 @@ public class ProductServiceImpl implements ProductService {
                 product.getGenderTarget(),
                 product.getBasePrice(),
                 product.getMainImageUrl(),
-                product.isActive()
-        );
+                product.isActive(),
+                badge,
+                variantDtos);
     }
 }
