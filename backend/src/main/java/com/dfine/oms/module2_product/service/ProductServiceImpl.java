@@ -102,23 +102,38 @@ public class ProductServiceImpl implements ProductService {
             catName = product.getCategory().getCategoryName();
         }
 
+        // guard against null or empty variants list to prevent NPE
+        if (product.getVariants() == null || product.getVariants().isEmpty()) {
+            return new ProductResponse(
+                    product.getProductId(),
+                    catId,
+                    catName,
+                    product.getProductName(),
+                    product.getProductDescription(),
+                    product.getGenderTarget(),
+                    product.getBasePrice(),
+                    product.getMainImageUrl(),
+                    product.isActive(),
+                    "OUT_OF_STOCK",
+                    new ArrayList<>()
+            );
+        }
+
         // calculate aggregate stock badge
         int totalStock = 0;
         boolean anyLowStock = false;
         List<VariantDto> variantDtos = new ArrayList<>();
 
-        if (product.getVariants() != null) {
-            for (ProductVariant v : product.getVariants()) {
-                totalStock += v.getStockQuantity();
-                if (v.getStockQuantity() <= v.getLowStockThreshold() && v.getStockQuantity() > 0) {
-                    anyLowStock = true;
-                }
-                String itemStatus = (v.getStockQuantity() == 0) ? "OUT_OF_STOCK"
-                        : (v.getStockQuantity() <= v.getLowStockThreshold()) ? "LOW_STOCK" : "IN_STOCK";
-                variantDtos.add(new VariantDto(
-                        v.getVariantId(), v.getSku(), v.getSize(), v.getColor(),
-                        java.math.BigDecimal.ZERO, v.getStockQuantity(), v.getLowStockThreshold(), itemStatus));
+        for (ProductVariant v : product.getVariants()) {
+            totalStock += v.getStockQuantity();
+            if (v.getStockQuantity() <= v.getLowStockThreshold() && v.getStockQuantity() > 0) {
+                anyLowStock = true;
             }
+            String itemStatus = (v.getStockQuantity() == 0) ? "OUT_OF_STOCK"
+                    : (v.getStockQuantity() <= v.getLowStockThreshold()) ? "LOW_STOCK" : "IN_STOCK";
+            variantDtos.add(new VariantDto(
+                    v.getVariantId(), v.getSku(), v.getSize(), v.getColor(),
+                    java.math.BigDecimal.ZERO, v.getStockQuantity(), v.getLowStockThreshold(), itemStatus));
         }
 
         String badge = "OUT_OF_STOCK";
