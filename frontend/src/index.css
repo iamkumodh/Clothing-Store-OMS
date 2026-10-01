@@ -2,8 +2,21 @@
 @import 'tw-animate-css';
 
 @layer base {
+  :root {
+    --color-canvas-base: #ffffff;
+    --color-surface-subtle: #fafafa;
+    --color-surface-muted: #f4f4f5;
+    --color-fg-primary: #0a0a0a;
+    --color-fg-muted: #71717a;
+    --color-fg-subtle: #52525b;
+    --color-border-default: #e4e4e7;
+    --color-border-subtle: #f4f4f5;
+    --color-cta-bg: #000000;
+    --color-cta-fg: #ffffff;
+  }
+
   body {
-    @apply bg-white text-[#2a3743] antialiased selection:bg-[#2a3743] selection:text-white;
+    @apply bg-white text-[#0a0a0a] antialiased selection:bg-black selection:text-white;
     font-family:
       'Plus Jakarta Sans',
       -apple-system,

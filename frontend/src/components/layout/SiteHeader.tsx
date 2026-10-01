@@ -1,5 +1,5 @@
 /**
- * Site Header - Navigation, Logo & Quick Actions
+ * Site Header - Navigation, Logo & Quick Actions for T-Shirt Brand
  */
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -12,12 +12,15 @@ import {
   ChevronDownIcon,
 } from '../common/icons';
 import { useDfineStore } from '../../context/store-context';
+import { useAuth } from '../../modules/module1_user/context/AuthContext';
 
 export function SiteHeader({ variant = 'overlay' }: { variant?: 'overlay' | 'solid' }) {
   const location = useLocation();
   const isHome = location.pathname === '/';
   const { totalItems, setIsCartOpen, setIsMenuOpen, setIsSearchOpen } = useDfineStore();
-  const [activeMegamenu, setActiveMegamenu] = useState<string | null>(null);
+  const { user, isAuthenticated } = useAuth();
+  const isStaff = user?.role === 'STORE_STAFF' || user?.role === 'ADMIN' || user?.role === 'MANAGER';
+  const [activeMegamenu, setActiveMegamenu] = useState<'men' | 'women' | 'unisex' | null>(null);
   const [isStuck, setIsStuck] = useState(false);
 
   const prevScrollRef = useRef(0);
@@ -32,7 +35,7 @@ export function SiteHeader({ variant = 'overlay' }: { variant?: 'overlay' | 'sol
         window.requestAnimationFrame(() => {
           const currentY = window.scrollY;
 
-          // Hysteresis threshold for ultra-clean, jitter-free transition
+          // Hysteresis threshold for smooth transition
           if (currentY > 110) {
             setIsStuck(true);
             setActiveMegamenu(null);
@@ -53,41 +56,24 @@ export function SiteHeader({ variant = 'overlay' }: { variant?: 'overlay' | 'sol
 
   return (
     <>
-      {/* 
-        Official D'fine Header Structure:
-        1. When at top (isStuck = false):
-           - Positioned absolute over hero banner (top: 37px)
-           - Subtle linear top vignette gradient for crystal-clear readability
-           - Toolbar visible with border-b border-white/20
-           - Text & icons: pure white
-           - White inverted logo
-        2. When scrolled (isStuck = true):
-           - Positioned fixed top: 0
-           - Translates down by 37px (docking cleanly under sticky announcement bar)
-           - Easing: cubic-bezier(0.165, 0.84, 0.44, 1) (0.4s)
-           - Background: pure white with subtle shadow
-           - Text & icons: dark charcoal #2a3743
-           - Dark logo
-           - Toolbar hidden
-      */}
       <div
         className={`w-full z-40 transition-[background-color,color,box-shadow] duration-300 ease-[cubic-bezier(0.165,0.84,0.44,1)] ${
           variant === 'solid'
-            ? 'sticky top-0 bg-white text-[#2a3743] border-b border-[#e5e5e5] shadow-xs'
+            ? 'sticky top-0 bg-white text-[#0a0a0a] border-b border-zinc-200 shadow-xs'
             : isStuck
-              ? 'fixed top-0 left-0 right-0 bg-white text-[#2a3743] shadow-[0_1px_3px_rgba(0,0,0,0.08)]'
-              : 'absolute top-0 left-0 right-0 bg-gradient-to-b from-black/35 via-black/15 to-transparent text-white'
+              ? 'fixed top-0 left-0 right-0 bg-white text-[#0a0a0a] shadow-[0_1px_3px_rgba(0,0,0,0.08)] border-b border-zinc-200'
+              : 'absolute top-0 left-0 right-0 bg-gradient-to-b from-black/40 via-black/20 to-transparent text-white'
         }`}
         onMouseLeave={() => setActiveMegamenu(null)}
       >
-        {/* Main Navigation Bar (Clean center-split layout) */}
+        {/* Main Navigation Bar */}
         <header className="relative w-full">
           <div
             className={`max-w-[1600px] mx-auto px-8 grid grid-cols-[1fr_auto_1fr] items-center transition-[height] duration-300 ${
               isHome && !isStuck ? 'h-[76px] sm:h-[84px]' : 'h-[64px]'
             }`}
           >
-            {/* Left Zone: Search / Hamburger + Left Nav */}
+            {/* Left Zone: Hamburger/Search + Navigation */}
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-3">
                 <button
@@ -107,47 +93,69 @@ export function SiteHeader({ variant = 'overlay' }: { variant?: 'overlay' | 'sol
                 </button>
               </div>
 
-              {/* Left Navigation: New, Clothing, Sale */}
-              <nav className="hidden lg:flex items-center gap-7 text-[13px] font-medium tracking-wide">
-                {/* New Megamenu */}
+              {/* Left Navigation: Men, Women, Unisex, GSM Guide, Sale */}
+              <nav className="hidden lg:flex items-center gap-6 text-[13px] font-medium tracking-wide">
+                {/* Men's Megamenu */}
                 <div
-                  className="relative py-5 cursor-pointer flex items-center gap-1.5 group"
-                  onMouseEnter={() => setActiveMegamenu('new')}
+                  className="relative py-5 cursor-pointer flex items-center gap-1 group"
+                  onMouseEnter={() => setActiveMegamenu('men')}
                 >
                   <Link
-                    to="/collections/2026-new"
+                    to="/collections/men"
                     className="hover:opacity-80 transition-opacity relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform"
                   >
-                    New
+                    Men
                   </Link>
                   <ChevronDownIcon className="w-2.5 h-2.5 opacity-70 group-hover:rotate-180 transition-transform" />
                 </div>
 
-                {/* Clothing Megamenu */}
+                {/* Women's Megamenu */}
                 <div
-                  className="relative py-5 cursor-pointer flex items-center gap-1.5 group"
-                  onMouseEnter={() => setActiveMegamenu('clothing')}
+                  className="relative py-5 cursor-pointer flex items-center gap-1 group"
+                  onMouseEnter={() => setActiveMegamenu('women')}
                 >
                   <Link
-                    to="#categories"
+                    to="/collections/women"
                     className="hover:opacity-80 transition-opacity relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform"
                   >
-                    Clothing
+                    Women
                   </Link>
                   <ChevronDownIcon className="w-2.5 h-2.5 opacity-70 group-hover:rotate-180 transition-transform" />
                 </div>
+
+                {/* Unisex Megamenu */}
+                <div
+                  className="relative py-5 cursor-pointer flex items-center gap-1 group"
+                  onMouseEnter={() => setActiveMegamenu('unisex')}
+                >
+                  <Link
+                    to="/collections/unisex"
+                    className="hover:opacity-80 transition-opacity relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform"
+                  >
+                    Unisex & Streetwear
+                  </Link>
+                  <ChevronDownIcon className="w-2.5 h-2.5 opacity-70 group-hover:rotate-180 transition-transform" />
+                </div>
+
+                {/* GSM Guide Anchor */}
+                <a
+                  href="/#gsm-guide"
+                  className="hover:opacity-80 transition-opacity relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
+                >
+                  GSM & Fit Guide
+                </a>
 
                 {/* Sale Link */}
                 <Link
-                  to="#essentials"
-                  className="hover:opacity-80 transition-opacity relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
+                  to="/collections/sale"
+                  className="hover:opacity-80 transition-opacity text-rose-400 hover:text-rose-500 relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
                 >
                   Sale
                 </Link>
               </nav>
             </div>
 
-            {/* Center Zone: Brand Logo with buttery cross-fade */}
+            {/* Center Zone: Brand Logo */}
             <div className="px-8 flex justify-center">
               <Link to="/" className="flex items-center justify-center">
                 <DfineLogo
@@ -163,26 +171,45 @@ export function SiteHeader({ variant = 'overlay' }: { variant?: 'overlay' | 'sol
               </Link>
             </div>
 
-            {/* Right Zone: Right Nav + Right Icons */}
+            {/* Right Zone: All Tees + Account & Bag */}
             <div className="flex items-center justify-end gap-8">
-              {/* Right Navigation: All Collections */}
               <nav className="hidden lg:flex items-center gap-7 text-[13px] font-medium tracking-wide">
                 <Link
-                  to="/collections/2026-new"
+                  to="/collections/all"
                   className="hover:opacity-80 transition-opacity relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
                 >
-                  All Collections
+                  All T-Shirts
                 </Link>
               </nav>
 
-              {/* Right Icons: Account & Cart Bag */}
-              <div className="flex items-center gap-4 sm:gap-5">
+              <div className="flex items-center gap-3 sm:gap-4">
+                {isStaff && (
+                  <Link
+                    to="/admin"
+                    className={`hidden md:inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded border transition-colors ${
+                      isStuck || variant === 'solid'
+                        ? 'border-black text-black hover:bg-black hover:text-white'
+                        : 'border-white text-white hover:bg-white hover:text-black'
+                    }`}
+                  >
+                    Admin Portal
+                  </Link>
+                )}
+
                 <Link
-                  to="/account/login"
-                  className="hidden sm:block p-1 hover:opacity-75 transition-opacity focus:outline-none"
-                  aria-label="Account"
+                  to={isAuthenticated ? (isStaff ? '/admin' : '/account') : '/account/login'}
+                  className="hidden sm:block p-1 hover:opacity-75 transition-opacity focus:outline-none relative"
+                  aria-label={isAuthenticated ? 'My Account' : 'Sign In'}
+                  title={isAuthenticated ? (isStaff ? 'Admin Portal' : 'My Account') : 'Sign In'}
                 >
                   <AccountIcon className="w-5 h-5" />
+                  {isAuthenticated && (
+                    <span
+                      className={`absolute bottom-0 right-0 w-2 h-2 rounded-full ring-1 ring-white ${
+                        isStaff ? 'bg-rose-500' : 'bg-emerald-500'
+                      }`}
+                    />
+                  )}
                 </Link>
 
                 <button
@@ -195,8 +222,8 @@ export function SiteHeader({ variant = 'overlay' }: { variant?: 'overlay' | 'sol
                     <span
                       className={`absolute -top-1 -right-1 text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center transition-colors ${
                         isStuck || variant === 'solid'
-                          ? 'bg-[#2a3743] text-white'
-                          : 'bg-white text-[#2a3743]'
+                          ? 'bg-black text-white'
+                          : 'bg-white text-black'
                       }`}
                     >
                       {totalItems}
@@ -207,454 +234,337 @@ export function SiteHeader({ variant = 'overlay' }: { variant?: 'overlay' | 'sol
             </div>
           </div>
 
-          {/* 3. Dropdown Megamenus (Desktop) */}
-          {/* 'New' Megamenu */}
-          {activeMegamenu === 'new' && (
+          {/* Megamenu: Men */}
+          {activeMegamenu === 'men' && (
             <div
-              className="absolute top-full left-0 w-full bg-white text-[#2a3743] border-b border-[#e5e5e5] shadow-2xl py-10 px-8 z-50 animate-in fade-in slide-in-from-top-1 duration-200"
-              onMouseEnter={() => setActiveMegamenu('new')}
+              className="absolute top-full left-0 w-full bg-white text-[#0a0a0a] border-b border-zinc-200 shadow-2xl py-8 px-8 z-50 animate-in fade-in slide-in-from-top-1 duration-200"
+              onMouseEnter={() => setActiveMegamenu('men')}
               onMouseLeave={() => setActiveMegamenu(null)}
             >
-              <div className="max-w-[1500px] mx-auto grid grid-cols-6 gap-8 text-[13px]">
-                {/* Column 1: Featured */}
+              <div className="max-w-[1400px] mx-auto grid grid-cols-4 gap-8 text-[13px]">
+                {/* Column 1: By Fit */}
                 <div>
-                  <h3 className="font-semibold text-[13px] tracking-wide uppercase text-neutral-900 mb-4 pb-1 border-b border-neutral-100">
-                    Featured
+                  <h3 className="font-semibold text-[12px] tracking-wider uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
+                    By Fit / Cut
                   </h3>
-                  <ul className="space-y-3 text-neutral-600">
+                  <ul className="space-y-2.5 text-neutral-600">
                     <li>
-                      <Link
-                        to="#all-new"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        All New
+                      <Link to="/collections/men?fit=Oversized" className="hover:text-black hover:underline transition-all">
+                        Oversized & Drop-Shoulder
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#all-new"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        New This Week
+                      <Link to="/collections/men?fit=Relaxed" className="hover:text-black hover:underline transition-all">
+                        Relaxed Everyday Fit
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#essentials"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Staff Picks
+                      <Link to="/collections/men?fit=Classic" className="hover:text-black hover:underline transition-all">
+                        Classic Regular Crew
                       </Link>
                     </li>
                     <li>
-                      <Link to="#hero" className="hover:text-black hover:underline transition-all">
-                        Spring / Summer Edit
+                      <Link to="/collections/men" className="hover:text-black hover:underline transition-all">
+                        View All Men's Fits
                       </Link>
                     </li>
                   </ul>
                 </div>
 
-                {/* Column 2: Shop By Category */}
+                {/* Column 2: By Style & Weight */}
                 <div>
-                  <h3 className="font-semibold text-[13px] tracking-wide uppercase text-neutral-900 mb-4 pb-1 border-b border-neutral-100">
-                    Shop By Category
+                  <h3 className="font-semibold text-[12px] tracking-wider uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
+                    By Style & Fabric
                   </h3>
-                  <ul className="space-y-3 text-neutral-600">
+                  <ul className="space-y-2.5 text-neutral-600">
                     <li>
-                      <Link
-                        to="#categories"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        New Dresses
+                      <Link to="/collections/men?gsm=260" className="hover:text-black hover:underline transition-all">
+                        Heavyweight Blanks (260 GSM)
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#categories"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        New Tops
+                      <Link to="/collections/men?category=Vintage+Washed" className="hover:text-black hover:underline transition-all">
+                        Vintage Pigment-Dyed
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#categories"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        New Bottoms
+                      <Link to="/collections/men?gsm=180" className="hover:text-black hover:underline transition-all">
+                        Everyday Pima Cotton (180 GSM)
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#categories"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        New Layers
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#mosaic"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        New Linen
+                      <Link to="/collections/men" className="hover:text-black hover:underline transition-all">
+                        Stripe & Texture Series
                       </Link>
                     </li>
                   </ul>
                 </div>
 
-                {/* Column 3: Shop By Occasion */}
+                {/* Column 3: Curated Edits */}
                 <div>
-                  <h3 className="font-semibold text-[13px] tracking-wide uppercase text-neutral-900 mb-4 pb-1 border-b border-neutral-100">
-                    Shop By Occasion
+                  <h3 className="font-semibold text-[12px] tracking-wider uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
+                    Curated Drops
                   </h3>
-                  <ul className="space-y-3 text-neutral-600">
+                  <ul className="space-y-2.5 text-neutral-600">
                     <li>
-                      <Link
-                        to="#essentials"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Everyday Essentials
+                      <Link to="/collections/men" className="hover:text-black hover:underline transition-all">
+                        New Men's Drops
                       </Link>
                     </li>
                     <li>
-                      <Link to="#promo" className="hover:text-black hover:underline transition-all">
-                        Workwear
+                      <Link to="/collections/men" className="hover:text-black hover:underline transition-all">
+                        Bestseller Monochrome Capsule
                       </Link>
                     </li>
                     <li>
-                      <Link to="#hero" className="hover:text-black hover:underline transition-all">
-                        Weekend
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#mosaic"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Vacation Ready
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#essentials"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Event Dressing
-                      </Link>
+                      <a href="/#gsm-guide" className="hover:text-black hover:underline transition-all">
+                        Men's Fit & GSM Guide
+                      </a>
                     </li>
                   </ul>
                 </div>
 
-                {/* Column 4: Collections */}
-                <div>
-                  <h3 className="font-semibold text-[13px] tracking-wide uppercase text-neutral-900 mb-4 pb-1 border-b border-neutral-100">
-                    Collections
-                  </h3>
-                  <ul className="space-y-3 text-neutral-600">
-                    <li>
-                      <Link
-                        to="#mosaic"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        The Linen Edit
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#essentials"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Minimalist Staples
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#categories"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Soft Tailoring
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#mosaic"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Neutral Tones
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#all-new"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Monochrome Looks
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-
-                {/* Promo Card 1: Linen Favorites */}
+                {/* Column 4: Feature Card */}
                 <div className="flex flex-col group/card cursor-pointer">
                   <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2px] bg-neutral-100 mb-3">
                     <img
-                      src="/images/dfine-img-000.png"
-                      alt="Linen Favorites"
-                      className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
+                      src="/images/coll-the-base-crew.png"
+                      alt="Minimalist Signature Heavy Tee"
+                      className="w-full h-full object-cover transition-opacity duration-300 group-hover/card:opacity-90"
                       loading="lazy"
                     />
+                    <div className="absolute top-2 left-2 bg-black text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-xs">
+                      260 GSM Heavy
+                    </div>
                   </div>
-                  <h4 className="font-semibold text-[13px] text-neutral-900 group-hover/card:text-black">
-                    Linen Favorites
-                  </h4>
+                  <h4 className="font-semibold text-[13px] text-neutral-900">Minimalist Heavy Tee</h4>
                   <p className="text-[12px] text-neutral-500 mt-0.5 leading-snug">
-                    Breathable, relaxed pieces for everyday wear
+                    Architectural boxy cut in pure organic combed cotton
                   </p>
-                </div>
-
-                {/* Promo Card 2: The Wren Coat */}
-                <div className="flex flex-col group/card cursor-pointer">
-                  <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2px] bg-neutral-100 mb-3">
-                    <img
-                      src="/images/dfine-img-001.png"
-                      alt="The Wren Coat"
-                      className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                  </div>
-                  <h4 className="font-semibold text-[13px] text-neutral-900">New This Week</h4>
-                  <span className="inline-block mt-1 text-[11px] font-semibold uppercase tracking-wider text-neutral-800 underline underline-offset-2">
-                    The Wren Coat
-                  </span>
                 </div>
               </div>
             </div>
           )}
 
-          {/* 'Clothing' Megamenu */}
-          {activeMegamenu === 'clothing' && (
+          {/* Megamenu: Women */}
+          {activeMegamenu === 'women' && (
             <div
-              className="absolute top-full left-0 w-full bg-white text-[#2a3743] border-b border-[#e5e5e5] shadow-2xl py-10 px-8 z-50 animate-in fade-in slide-in-from-top-1 duration-200"
-              onMouseEnter={() => setActiveMegamenu('clothing')}
+              className="absolute top-full left-0 w-full bg-white text-[#0a0a0a] border-b border-zinc-200 shadow-2xl py-8 px-8 z-50 animate-in fade-in slide-in-from-top-1 duration-200"
+              onMouseEnter={() => setActiveMegamenu('women')}
               onMouseLeave={() => setActiveMegamenu(null)}
             >
-              <div className="max-w-[1500px] mx-auto grid grid-cols-5 gap-8 text-[13px]">
-                {/* Category 1: Tops */}
+              <div className="max-w-[1400px] mx-auto grid grid-cols-4 gap-8 text-[13px]">
+                {/* Column 1: By Fit */}
                 <div>
-                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[2px] bg-neutral-100 mb-3 group/item">
-                    <img
-                      src="/images/dfine-img-003.jpg"
-                      alt="Tops"
-                      className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                  </div>
-                  <h3 className="font-semibold text-[13px] tracking-wide uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
-                    Tops
+                  <h3 className="font-semibold text-[12px] tracking-wider uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
+                    By Fit / Silhouette
                   </h3>
                   <ul className="space-y-2.5 text-neutral-600">
                     <li>
-                      <Link
-                        to="#all-new"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Tees
+                      <Link to="/collections/women?fit=Boxy+Cropped" className="hover:text-black hover:underline transition-all">
+                        Boxy Cropped Street Tee
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#essentials"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Shirts
+                      <Link to="/collections/women?fit=Classic" className="hover:text-black hover:underline transition-all">
+                        Relaxed Everyday Baby Tee
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#all-new"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Knit Tops
+                      <Link to="/collections/women?fit=Relaxed" className="hover:text-black hover:underline transition-all">
+                        Washed Boyfriend Drop
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/collections/women" className="hover:text-black hover:underline transition-all">
+                        View All Women's Fits
                       </Link>
                     </li>
                   </ul>
                 </div>
 
-                {/* Category 2: Bottoms */}
+                {/* Column 2: By Style & Fabric */}
                 <div>
-                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[2px] bg-neutral-100 mb-3 group/item">
-                    <img
-                      src="/images/dfine-img-004.jpg"
-                      alt="Bottoms"
-                      className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                  </div>
-                  <h3 className="font-semibold text-[13px] tracking-wide uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
-                    Bottoms
+                  <h3 className="font-semibold text-[12px] tracking-wider uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
+                    By Style & Fabric
                   </h3>
                   <ul className="space-y-2.5 text-neutral-600">
                     <li>
-                      <Link
-                        to="#essentials"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Trousers
+                      <Link to="/collections/women?gsm=240" className="hover:text-black hover:underline transition-all">
+                        Dense 240 GSM Jersey
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#essentials"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Skirts
+                      <Link to="/collections/women?gsm=180" className="hover:text-black hover:underline transition-all">
+                        Soft Ribbed Combed Cotton
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#essentials"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Shorts
+                      <Link to="/collections/women?category=Graphic+Tees" className="hover:text-black hover:underline transition-all">
+                        Minimalist Typography & Prints
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/collections/women?category=Vintage+Washed" className="hover:text-black hover:underline transition-all">
+                        Vintage Garment Washed
                       </Link>
                     </li>
                   </ul>
                 </div>
 
-                {/* Category 3: Dresses */}
+                {/* Column 3: Curated Edits */}
                 <div>
-                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[2px] bg-neutral-100 mb-3 group/item">
-                    <img
-                      src="/images/dfine-img-005.jpg"
-                      alt="Dresses"
-                      className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                  </div>
-                  <h3 className="font-semibold text-[13px] tracking-wide uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
-                    Dresses
+                  <h3 className="font-semibold text-[12px] tracking-wider uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
+                    Curated Drops
                   </h3>
                   <ul className="space-y-2.5 text-neutral-600">
                     <li>
-                      <Link to="#promo" className="hover:text-black hover:underline transition-all">
-                        Casual Dresses
+                      <Link to="/collections/women" className="hover:text-black hover:underline transition-all">
+                        New This Week
                       </Link>
                     </li>
                     <li>
-                      <Link to="#promo" className="hover:text-black hover:underline transition-all">
-                        Midi Dresses
+                      <Link to="/collections/women" className="hover:text-black hover:underline transition-all">
+                        The Cropped Essentials Edit
                       </Link>
                     </li>
                     <li>
-                      <Link to="#promo" className="hover:text-black hover:underline transition-all">
-                        Occasion Dresses
+                      <a href="/#gsm-guide" className="hover:text-black hover:underline transition-all">
+                        Women's Fit & Fabric Guide
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Column 4: Feature Card */}
+                <div className="flex flex-col group/card cursor-pointer">
+                  <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2px] bg-neutral-100 mb-3">
+                    <img
+                      src="/images/coll-the-ines-tee.png"
+                      alt="Boxy Cropped Street Tee"
+                      className="w-full h-full object-cover transition-opacity duration-300 group-hover/card:opacity-90"
+                      loading="lazy"
+                    />
+                    <div className="absolute top-2 left-2 bg-black text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-xs">
+                      240 GSM Dense
+                    </div>
+                  </div>
+                  <h4 className="font-semibold text-[13px] text-neutral-900">Boxy Cropped Street Tee</h4>
+                  <p className="text-[12px] text-neutral-500 mt-0.5 leading-snug">
+                    Structured wide crop with seamless collar binding
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Megamenu: Unisex */}
+          {activeMegamenu === 'unisex' && (
+            <div
+              className="absolute top-full left-0 w-full bg-white text-[#0a0a0a] border-b border-zinc-200 shadow-2xl py-8 px-8 z-50 animate-in fade-in slide-in-from-top-1 duration-200"
+              onMouseEnter={() => setActiveMegamenu('unisex')}
+              onMouseLeave={() => setActiveMegamenu(null)}
+            >
+              <div className="max-w-[1400px] mx-auto grid grid-cols-4 gap-8 text-[13px]">
+                {/* Column 1: Fit & Cut */}
+                <div>
+                  <h3 className="font-semibold text-[12px] tracking-wider uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
+                    Silhouette & Cut
+                  </h3>
+                  <ul className="space-y-2.5 text-neutral-600">
+                    <li>
+                      <Link to="/collections/unisex?fit=Oversized" className="hover:text-black hover:underline transition-all">
+                        Heavyweight Drop-Shoulder
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/collections/unisex?fit=Oversized" className="hover:text-black hover:underline transition-all">
+                        Architectural Boxy Cut
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/collections/unisex?fit=Relaxed" className="hover:text-black hover:underline transition-all">
+                        Relaxed Street Fit
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/collections/unisex" className="hover:text-black hover:underline transition-all">
+                        View All Streetwear Cuts
                       </Link>
                     </li>
                   </ul>
                 </div>
 
-                {/* Category 4: Layers */}
+                {/* Column 2: Styles & Drops */}
                 <div>
-                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[2px] bg-neutral-100 mb-3 group/item">
-                    <img
-                      src="/images/dfine-img-006.jpg"
-                      alt="Layers"
-                      className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                  </div>
-                  <h3 className="font-semibold text-[13px] tracking-wide uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
-                    Layers
+                  <h3 className="font-semibold text-[12px] tracking-wider uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
+                    Drops & Graphics
                   </h3>
                   <ul className="space-y-2.5 text-neutral-600">
                     <li>
-                      <Link to="#promo" className="hover:text-black hover:underline transition-all">
-                        Blazers
+                      <Link to="/collections/unisex?category=Graphic+Tees" className="hover:text-black hover:underline transition-all">
+                        Tokyo Drift Graphic Series
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#all-new"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Jackets
+                      <Link to="/collections/unisex?category=Vintage+Washed" className="hover:text-black hover:underline transition-all">
+                        Acid-Wash Cyberpunk Series
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#all-new"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Cardigans
+                      <Link to="/collections/unisex?gsm=260" className="hover:text-black hover:underline transition-all">
+                        Pure Heavyweight Blanks (260 GSM)
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#all-new"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Sweaters
+                      <Link to="/collections/unisex" className="hover:text-black hover:underline transition-all">
+                        Custom DTG Canvas Series
                       </Link>
                     </li>
                   </ul>
                 </div>
 
-                {/* Category 5: Linen */}
+                {/* Column 3: Curated Edits */}
                 <div>
-                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[2px] bg-neutral-100 mb-3 group/item">
-                    <img
-                      src="/images/dfine-img-007.jpg"
-                      alt="Linen"
-                      className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                  </div>
-                  <h3 className="font-semibold text-[13px] tracking-wide uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
-                    Linen
+                  <h3 className="font-semibold text-[12px] tracking-wider uppercase text-neutral-900 mb-3 pb-1 border-b border-neutral-100">
+                    Curated Drops
                   </h3>
                   <ul className="space-y-2.5 text-neutral-600">
                     <li>
-                      <Link
-                        to="#mosaic"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Linen Dresses
+                      <Link to="/collections/unisex" className="hover:text-black hover:underline transition-all">
+                        Streetwear Bestsellers
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#mosaic"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Linen Shirts
+                      <Link to="/collections/unisex" className="hover:text-black hover:underline transition-all">
+                        Limited Batch Prints
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        to="#mosaic"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Linen Pants
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#mosaic"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Linen Shorts
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#mosaic"
-                        className="hover:text-black hover:underline transition-all"
-                      >
-                        Linen Layers
-                      </Link>
+                      <a href="/#gsm-guide" className="hover:text-black hover:underline transition-all">
+                        Textile Weight & GSM Breakdown
+                      </a>
                     </li>
                   </ul>
+                </div>
+
+                {/* Column 4: Feature Card */}
+                <div className="flex flex-col group/card cursor-pointer">
+                  <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2px] bg-neutral-100 mb-3">
+                    <img
+                      src="/images/coll-the-nico-tee.png"
+                      alt="Tokyo Drift Oversized Tee"
+                      className="w-full h-full object-cover transition-opacity duration-300 group-hover/card:opacity-90"
+                      loading="lazy"
+                    />
+                    <div className="absolute top-2 left-2 bg-black text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-xs">
+                      240 GSM Graphic
+                    </div>
+                  </div>
+                  <h4 className="font-semibold text-[13px] text-neutral-900">Tokyo Drift Oversized Tee</h4>
+                  <p className="text-[12px] text-neutral-500 mt-0.5 leading-snug">
+                    High-density screenprint on pre-shrunk combed cotton
+                  </p>
                 </div>
               </div>
             </div>

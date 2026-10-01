@@ -16,13 +16,14 @@ import { SearchModal } from './components/modals/SearchModal';
 import HomePage from './pages/HomePage';
 import CollectionPage from './pages/CollectionPage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import SearchPage from './pages/SearchPage';
 
 function AppShell() {
   const location = useLocation();
   const isHome = location.pathname === '/';
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-white text-[#2a3743] antialiased selection:bg-[#2a3743] selection:text-white">
+    <div className="relative min-h-screen flex flex-col bg-white text-[#0a0a0a] antialiased selection:bg-black selection:text-white">
       <SiteHeader variant={isHome ? 'overlay' : 'solid'} />
 
       <MobileDrawer />
@@ -39,6 +40,7 @@ function AppShell() {
             path="/collections/:collectionHandle/products/:handle"
             element={<ProductDetailPage />}
           />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

@@ -23,17 +23,17 @@ export function SiteFooter() {
   };
 
   return (
-    <footer className="bg-white text-[#2a3743] pt-16 pb-12 border-t border-[#e8e6e3]">
+    <footer className="bg-white text-[#0a0a0a] pt-16 pb-12 border-t border-zinc-200">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-[#e8e6e3]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-zinc-200">
           {/* Brand Info */}
           <div className="space-y-4">
-            <DfineLogo className="text-[#2a3743]" />
-            <p className="text-[13px] text-[#526b81] font-light leading-relaxed max-w-[280px]">
+            <DfineLogo className="text-black" />
+            <p className="text-[13px] text-zinc-500 font-light leading-relaxed max-w-[280px]">
               Effortless everyday apparel thoughtfully crafted from breathable natural linen,
               organic cotton, and soft knits.
             </p>
-            <div className="flex items-center gap-4 pt-1 text-[#526b81]">
+            <div className="flex items-center gap-4 pt-1 text-zinc-500">
               <a
                 href="https://instagram.com"
                 target="_blank"
@@ -75,37 +75,37 @@ export function SiteFooter() {
 
           {/* SHOP */}
           <div>
-            <h4 className="text-[12px] font-bold tracking-wider uppercase text-[#2a3743] mb-4">
+            <h4 className="text-[12px] font-bold tracking-wider uppercase text-[#0a0a0a] mb-4">
               Shop
             </h4>
-            <ul className="space-y-2.5 text-[13px] text-[#425567]">
+            <ul className="space-y-2.5 text-[13px] text-zinc-600">
               <li>
-                <Link to="#all-new" className="hover:text-black">
+                <Link to="#all-new" className="hover:text-black transition-colors">
                   New Arrivals
                 </Link>
               </li>
               <li>
-                <Link to="#essentials" className="hover:text-black">
+                <Link to="#essentials" className="hover:text-black transition-colors">
                   Best Sellers
                 </Link>
               </li>
               <li>
-                <Link to="/collections/2026-new" className="hover:text-black">
+                <Link to="/collections/2026-new" className="hover:text-black transition-colors">
                   Dresses
                 </Link>
               </li>
               <li>
-                <Link to="/collections/2026-new" className="hover:text-black">
+                <Link to="/collections/2026-new" className="hover:text-black transition-colors">
                   Tees & Tops
                 </Link>
               </li>
               <li>
-                <Link to="#hero" className="hover:text-black">
+                <Link to="#hero" className="hover:text-black transition-colors">
                   The Linen Edit
                 </Link>
               </li>
               <li>
-                <Link to="#essentials" className="text-amber-800 font-semibold hover:opacity-80">
+                <Link to="#essentials" className="text-black font-semibold hover:opacity-80 transition-opacity">
                   Sale
                 </Link>
               </li>
@@ -114,22 +114,22 @@ export function SiteFooter() {
 
           {/* THE COMPANY */}
           <div>
-            <h4 className="text-[12px] font-bold tracking-wider uppercase text-[#2a3743] mb-4">
+            <h4 className="text-[12px] font-bold tracking-wider uppercase text-[#0a0a0a] mb-4">
               The Company
             </h4>
-            <ul className="space-y-2.5 text-[13px] text-[#425567]">
+            <ul className="space-y-2.5 text-[13px] text-zinc-600">
               <li>
-                <Link to="/collections/2026-new" className="hover:text-black">
+                <Link to="/collections/2026-new" className="hover:text-black transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/collections/2026-new" className="hover:text-black">
+                <Link to="/collections/2026-new" className="hover:text-black transition-colors">
                   Our Story
                 </Link>
               </li>
               <li>
-                <Link to="/collections/2026-new" className="hover:text-black">
+                <Link to="/collections/2026-new" className="hover:text-black transition-colors">
                   Careers
                 </Link>
               </li>
@@ -138,32 +138,32 @@ export function SiteFooter() {
 
           {/* GET HELP */}
           <div>
-            <h4 className="text-[12px] font-bold tracking-wider uppercase text-[#2a3743] mb-4">
+            <h4 className="text-[12px] font-bold tracking-wider uppercase text-[#0a0a0a] mb-4">
               Get Help
             </h4>
-            <ul className="space-y-2.5 text-[13px] text-[#425567]">
+            <ul className="space-y-2.5 text-[13px] text-zinc-600">
               <li>
-                <Link to="#essentials" className="hover:text-black">
+                <Link to="#essentials" className="hover:text-black transition-colors">
                   Customer Service
                 </Link>
               </li>
               <li>
-                <Link to="#essentials" className="hover:text-black">
+                <Link to="#essentials" className="hover:text-black transition-colors">
                   Shipping & Delivery
                 </Link>
               </li>
               <li>
-                <Link to="#essentials" className="hover:text-black">
+                <Link to="#essentials" className="hover:text-black transition-colors">
                   Returns & Exchanges
                 </Link>
               </li>
               <li>
-                <Link to="#essentials" className="hover:text-black">
+                <Link to="#essentials" className="hover:text-black transition-colors">
                   Order Status
                 </Link>
               </li>
               <li>
-                <Link to="#essentials" className="hover:text-black">
+                <Link to="#essentials" className="hover:text-black transition-colors">
                   Contact Us
                 </Link>
               </li>
@@ -172,10 +172,10 @@ export function SiteFooter() {
 
           {/* Newsletter Form */}
           <div className="space-y-3">
-            <h4 className="text-[12px] font-bold tracking-wider uppercase text-[#2a3743]">
+            <h4 className="text-[12px] font-bold tracking-wider uppercase text-[#0a0a0a]">
               Sign up for D'fine updates
             </h4>
-            <p className="text-[13px] text-[#526b81] font-light leading-relaxed">
+            <p className="text-[13px] text-zinc-500 font-light leading-relaxed">
               Enjoy 10% off your first order, plus private invitations to seasonal drops.
             </p>
 
@@ -192,11 +192,11 @@ export function SiteFooter() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
-                  className="flex-1 px-3 py-2.5 bg-[#edebe7] text-[#2a3743] placeholder:text-[#888888] text-[13px] rounded-[2px] border border-transparent focus:border-[#2a3743] focus:outline-none"
+                  className="flex-1 px-3 py-2.5 bg-zinc-50 text-[#0a0a0a] placeholder:text-zinc-400 text-[13px] rounded-[2px] border border-zinc-300 focus:border-black focus:outline-none transition-colors"
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2.5 bg-[#2a3743] text-white hover:bg-black transition-colors text-[12px] font-semibold tracking-wider uppercase rounded-[2px]"
+                  className="px-4 py-2.5 bg-black text-white hover:bg-zinc-800 transition-colors text-[12px] font-semibold tracking-wider uppercase rounded-[2px] cursor-pointer"
                 >
                   Join
                 </button>
@@ -206,11 +206,11 @@ export function SiteFooter() {
         </div>
 
         {/* Bottom copyright */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] text-[#718292]">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] text-zinc-500">
           <p>© {new Date().getFullYear()} D'FINE CLOTHING STORE. ALL RIGHTS RESERVED.</p>
           <div className="flex items-center gap-5">
-            <span className="hover:text-black cursor-pointer">Privacy</span>
-            <span className="hover:text-black cursor-pointer">Terms</span>
+            <span className="hover:text-black cursor-pointer transition-colors">Privacy</span>
+            <span className="hover:text-black cursor-pointer transition-colors">Terms</span>
           </div>
         </div>
       </div>
