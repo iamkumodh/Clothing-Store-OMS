@@ -1,43 +1,33 @@
 package com.defineoms.defineoms.controller;
 
+import com.defineoms.defineoms.service.CartService;
 import com.defineoms.defineoms.entity.Cart;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
 
-    // temporary in-memory store for Postman testing before database setup
-    private static final Map<Integer, Cart> mockCartDb = new HashMap<>();
+    @Autowired
+    private CartService cartService;
 
-    @GetMapping("/ping")
-    public String ping() {
-        return "Cart controller running";
-    }
-
+    // GET http://localhost:8080/api/cart/5  -> returns/creates cart for customer 5
     @GetMapping("/{customerId}")
     public Cart getCart(@PathVariable Integer customerId) {
-        if (!mockCartDb.containsKey(customerId)) {
-            Cart c = new Cart();
-            c.setCartId(100 + customerId);
-            c.setCustomerId(customerId);
-            c.setCreatedAt(LocalDateTime.now());
-            c.setUpdatedAt(LocalDateTime.now());
-            mockCartDb.put(customerId, c);
-        }
-        return mockCartDb.get(customerId);
+        return cartService.getOrCreateCart(customerId);
     }
 
+    // GET http://localhost:8080/api/cart  -> lists every cart (for testing/admin)
     @GetMapping
     public List<Cart> getAllCarts() {
-        return new ArrayList<>(mockCartDb.values());
+        return cartService.getAllCarts();
     }
 
+    // DELETE http://localhost:8080/api/cart/5  -> removes a cart
     @DeleteMapping("/{cartId}")
-    public String deleteCart(@PathVariable Integer cartId) {
-        mockCartDb.remove(cartId);
-        return "Deleted cart " + cartId;
+    public void deleteCart(@PathVariable Integer cartId) {
+        cartService.deleteCart(cartId);
     }
 }

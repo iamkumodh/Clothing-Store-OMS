@@ -2,8 +2,6 @@ package com.defineoms.defineoms.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "cart")
@@ -18,27 +16,7 @@ public class Cart {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // temporary helper methods for initial testing
-    @Transient
-    private List<CartItem> temporaryItems = new ArrayList<>();
-
     public Cart() {}
-
-    public void addTempItem(CartItem item) {
-        this.temporaryItems.add(item);
-    }
-
-    public List<CartItem> getTemporaryItems() {
-        return this.temporaryItems;
-    }
-
-    public int getItemCount() {
-        return this.temporaryItems.size();
-    }
-
-    public void clearTempItems() {
-        this.temporaryItems.clear();
-    }
 
     // --- getters and setters ---
     public Integer getCartId() { return cartId; }
