@@ -27,14 +27,14 @@ public class Payment {
     @Column(name = "payment_method", nullable = false, length = 30)
     private String paymentMethod;
 
-    // Status: PENDING, VERIFIED, REJECTED, COMPLETED, FAILED
-    @Column(name = "payment_status", nullable = false, length = 20)
+    // Payment status: PENDING, VERIFIED, FAILED, REJECTED, REFUNDED
+    @Column(name = "payment_status", length = 20)
     private String paymentStatus = "PENDING";
 
-    @Column(name = "payment_date")
-    private LocalDateTime paymentDate;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Temporary helper methods for status checks
+    // Temporary helper methods for payment status checks
     @Transient
     public boolean isCompleted() {
         return "COMPLETED".equalsIgnoreCase(this.paymentStatus) || "VERIFIED".equalsIgnoreCase(this.paymentStatus);
@@ -46,7 +46,6 @@ public class Payment {
     }
 
     public Payment() {
-        this.paymentDate = LocalDateTime.now();
     }
 
     public Payment(Integer orderId, BigDecimal amount, String paymentMethod, String paymentStatus) {
@@ -54,7 +53,7 @@ public class Payment {
         this.amount = amount;
         this.paymentMethod = paymentMethod;
         this.paymentStatus = paymentStatus != null ? paymentStatus : "PENDING";
-        this.paymentDate = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 
     public Integer getPaymentId() {
@@ -97,11 +96,11 @@ public class Payment {
         this.paymentStatus = paymentStatus;
     }
 
-    public LocalDateTime getPaymentDate() {
-        return paymentDate;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setPaymentDate(LocalDateTime paymentDate) {
-        this.paymentDate = paymentDate;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
