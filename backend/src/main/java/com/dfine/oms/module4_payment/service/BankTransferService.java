@@ -92,16 +92,26 @@ public class BankTransferService {
         transfer.setVerifiedAt(LocalDateTime.now());
 
         if (request.isApproved()) {
+            // Slip is authentic: mark payment as VERIFIED and update order to PROCESSING
             transfer.setPaymentStatus("VERIFIED");
             transfer.setRejectionReason(null);
-            System.out.println("Payment slip verified by staff for paymentId: " + paymentId);
-            return bankTransferRepository.save(transfer);
+            BankTransferPayment saved = bankTransferRepository.save(transfer);
+
+            if (saved.getOrderId() != null) {
+                orderService.updateStatus(saved.getOrderId(), "PROCESSING", staffId, "Payment slip verified by staff member");
+            }
+            return saved;
         } else {
+            // Slip was rejected: mark payment as REJECTED and add rejection reason
             transfer.setPaymentStatus("REJECTED");
             String reason = request.rejectionReason() != null ? request.rejectionReason() : "Bank deposit slip could not be verified";
             transfer.setRejectionReason(reason);
-            System.out.println("Payment slip rejected for paymentId: " + paymentId);
-            return bankTransferRepository.save(transfer);
+            BankTransferPayment saved = bankTransferRepository.save(transfer);
+
+            if (saved.getOrderId() != null) {
+                orderService.updateStatus(saved.getOrderId(), "PENDING", staffId, "Bank slip rejected: " + reason);
+            }
+            return saved;
         }
     }
 

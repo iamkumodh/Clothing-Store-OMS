@@ -34,17 +34,6 @@ public class Payment {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Temporary helper methods for payment status checks
-    @Transient
-    public boolean isCompleted() {
-        return "COMPLETED".equalsIgnoreCase(this.paymentStatus) || "VERIFIED".equalsIgnoreCase(this.paymentStatus);
-    }
-
-    @Transient
-    public boolean isCashOnDelivery() {
-        return "CASH_ON_DELIVERY".equalsIgnoreCase(this.paymentMethod);
-    }
-
     public Payment() {
     }
 
