@@ -17,6 +17,12 @@ import HomePage from './pages/HomePage';
 import CollectionPage from './pages/CollectionPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import SearchPage from './pages/SearchPage';
+import LoginPage from './pages/LoginPage';
+
+// Module 1 Pages & Providers
+import { AuthProvider } from './modules/module1_user/context/AuthContext';
+import AccountPage from './modules/module1_user/pages/AccountPage';
+import InvoicePrintPage from './modules/module1_user/pages/InvoicePrintPage';
 
 function AppShell() {
   const location = useLocation();
@@ -41,6 +47,10 @@ function AppShell() {
             element={<ProductDetailPage />}
           />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/account/login" element={<LoginPage />} />
+          <Route path="/account/register" element={<LoginPage initialMode="register" />} />
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/invoices/:invoiceNumber" element={<InvoicePrintPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
@@ -53,9 +63,11 @@ function AppShell() {
 export default function App() {
   return (
     <BrowserRouter>
-      <DfineStoreProvider>
-        <AppShell />
-      </DfineStoreProvider>
+      <AuthProvider>
+        <DfineStoreProvider>
+          <AppShell />
+        </DfineStoreProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
