@@ -18,6 +18,8 @@ import CollectionPage from './pages/CollectionPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import SearchPage from './pages/SearchPage';
 import LoginPage from './pages/LoginPage';
+import CheckoutPage from './pages/CheckoutPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
 
 // Module 1 Pages & Providers
 import { AuthProvider } from './modules/module1_user/context/AuthContext';
@@ -47,6 +49,8 @@ function AppShell() {
             element={<ProductDetailPage />}
           />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/order-success/:orderId" element={<OrderSuccessPage />} />
           <Route path="/account/login" element={<LoginPage />} />
           <Route path="/account/register" element={<LoginPage initialMode="register" />} />
           <Route path="/account" element={<AccountPage />} />
