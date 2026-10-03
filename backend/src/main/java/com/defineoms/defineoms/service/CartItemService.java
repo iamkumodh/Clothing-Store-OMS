@@ -11,11 +11,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+// @Service Spring creates it once and
+// hands it out wherever it's needed, so never needs to type "new CartItemService()").
 @Service
 public class CartItemService {
 
+    // @Autowired means CartItemRepository is
+    // just an interface (remember, it had no actual code inside it).
     @Autowired
     private CartItemRepository cartItemRepository;
+
 
     @Autowired
     private ProductVariantRepository productVariantRepository;
@@ -25,6 +30,7 @@ public class CartItemService {
         Optional<ProductVariant> variantBox = productVariantRepository.findById(variantId);
 
         if (!variantBox.isPresent()) {
+
             throw new RuntimeException("Product variant not found");
         }
         ProductVariant variant = variantBox.get();
@@ -33,22 +39,64 @@ public class CartItemService {
             throw new RuntimeException("Insufficient stock for this variant");
         }
 
-        // naive implementation: directly creates new item
-        CartItem newItem = new CartItem();
-        newItem.setCartId(cartId);
-        newItem.setVariantId(variantId);
-        newItem.setQuantity(quantity);
-        newItem.setAddedAt(LocalDateTime.now());
-        return cartItemRepository.save(newItem);
+        Optional<CartItem> existingBox =
+                cartItemRepository.findByCartIdAndVariantId(cartId, variantId);
+
+        if (existingBox.isPresent()) {
+
+            CartItem item = existingBox.get();
+            item.setQuantity(item.getQuantity() + quantity);
+            return cartItemRepository.save(item);
+
+        } else {
+
+            CartItem newItem = new CartItem();
+            newItem.setCartId(cartId);
+            newItem.setVariantId(variantId);
+            newItem.setQuantity(quantity);
+            newItem.setAddedAt(LocalDateTime.now());
+            return cartItemRepository.save(newItem);
+        }
     }
 
     public List<CartItem> getItemsForCart(Integer cartId) {
+
         return cartItemRepository.findByCartId(cartId);
     }
 
-    // temporary debug method for checking item counts
-    public int getDebugItemCount(Integer cartId) {
+    public CartItem updateQuantity(Integer cartItemId, Integer newQuantity) {
+        Optional<CartItem> itemBox = cartItemRepository.findById(cartItemId);
+
+        if (!itemBox.isPresent()) {
+            throw new RuntimeException("Cart item not found");
+        }
+
+        CartItem item = itemBox.get();
+        item.setQuantity(newQuantity);
+        return cartItemRepository.save(item);
+    }
+
+    public void removeItem(Integer cartItemId) {
+
+        cartItemRepository.deleteById(cartItemId);
+    }
+
+    public double calculateCartSubtotal(Integer cartId) {
         List<CartItem> items = cartItemRepository.findByCartId(cartId);
-        return items != null ? items.size() : 0;
+        double subtotal = 0.0;
+
+        for (CartItem item : items) {
+            Optional<ProductVariant> variantBox =
+                    productVariantRepository.findById(item.getVariantId());
+
+            if (!variantBox.isPresent()) {
+                throw new RuntimeException("Variant not found");
+            }
+
+            ProductVariant variant = variantBox.get();
+            subtotal += item.getQuantity() * variant.getBasePrice();
+        }
+        return subtotal;
     }
 }
+
