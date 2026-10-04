@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS product_variant;
 DROP TABLE IF EXISTS product;
 DROP TABLE IF EXISTS category;
 DROP TABLE IF EXISTS user_login_audit;
+DROP TABLE IF EXISTS password_reset_token;
 DROP TABLE IF EXISTS store_staff;
 DROP TABLE IF EXISTS customer;
 DROP TABLE IF EXISTS app_user;
@@ -28,12 +29,12 @@ CREATE TABLE app_user (
     user_id INT AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    role VARCHAR(20) NOT NULL,
+    user_role VARCHAR(20) NOT NULL,
     account_status VARCHAR(20) DEFAULT 'ACTIVE',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_app_user PRIMARY KEY (user_id),
     CONSTRAINT uq_app_user_email UNIQUE (email),
-    CONSTRAINT chk_app_user_role CHECK (role IN ('CUSTOMER', 'STORE_STAFF', 'MANAGER', 'ADMIN')),
+    CONSTRAINT chk_app_user_role CHECK (user_role IN ('CUSTOMER', 'STORE_STAFF', 'MANAGER', 'ADMIN')),
     CONSTRAINT chk_app_user_status CHECK (account_status IN ('ACTIVE', 'SUSPENDED', 'DEACTIVATED'))
 );
 
@@ -73,10 +74,22 @@ CREATE TABLE user_login_audit (
     attempted_email VARCHAR(255),
     ip_address VARCHAR(45) NOT NULL,
     login_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    login_status VARCHAR(20) NOT NULL,
+    login_status VARCHAR(30) NOT NULL,
     CONSTRAINT pk_user_login_audit PRIMARY KEY (audit_id),
     CONSTRAINT fk_login_audit_user FOREIGN KEY (user_id) REFERENCES app_user(user_id) ON DELETE SET NULL,
     CONSTRAINT chk_login_audit_status CHECK (login_status IN ('SUCCESS', 'FAILED_BAD_CREDENTIALS', 'FAILED_LOCKED', 'LOGOUT'))
+);
+
+CREATE TABLE password_reset_token (
+    reset_id INT AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    token_hash CHAR(64) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL,
+    used_at DATETIME DEFAULT NULL,
+    CONSTRAINT pk_password_reset_token PRIMARY KEY (reset_id),
+    CONSTRAINT uq_password_reset_token UNIQUE (token_hash),
+    CONSTRAINT fk_password_reset_user FOREIGN KEY (user_id) REFERENCES app_user(user_id) ON DELETE CASCADE
 );
 
 -- Module 2
@@ -84,7 +97,7 @@ CREATE TABLE user_login_audit (
 CREATE TABLE category (
     category_id INT AUTO_INCREMENT,
     category_name VARCHAR(100) NOT NULL,
-    description TEXT,
+    category_description TEXT,
     CONSTRAINT pk_category PRIMARY KEY (category_id),
     CONSTRAINT uq_category_name UNIQUE (category_name)
 );
@@ -93,7 +106,7 @@ CREATE TABLE product (
     product_id INT AUTO_INCREMENT,
     category_id INT NOT NULL,
     product_name VARCHAR(255) NOT NULL,
-    description TEXT,
+    product_description TEXT,
     gender_target VARCHAR(20),
     base_price DECIMAL(10,2) NOT NULL,
     main_image_url VARCHAR(255) NOT NULL,
@@ -109,16 +122,18 @@ CREATE TABLE product_variant (
     variant_id INT AUTO_INCREMENT,
     product_id INT NOT NULL,
     sku VARCHAR(50) NOT NULL,
-    size VARCHAR(10) NOT NULL,
+    -- size is a reserved keyword in mySQL
+    size_label VARCHAR(10) NOT NULL,
     color VARCHAR(30) NOT NULL,
-    price_adjustment DECIMAL(10,2) DEFAULT 0.00,
     stock_quantity INT DEFAULT 0,
     low_stock_threshold INT DEFAULT 5,
     variant_image_url VARCHAR(255),
-    version INT DEFAULT 0,
+    -- Optimistic locking to prevent race conditions during concurrent checkouts
+    -- increases version counter by +1 everytime the row changes
+    lock_version INT DEFAULT 0,
     CONSTRAINT pk_product_variant PRIMARY KEY (variant_id),
     CONSTRAINT uq_variant_sku UNIQUE (sku),
-    CONSTRAINT uq_variant_combination UNIQUE (product_id, size, color),
+    CONSTRAINT uq_variant_combination UNIQUE (product_id, size_label, color),
     CONSTRAINT fk_variant_product FOREIGN KEY (product_id) REFERENCES product(product_id) ON DELETE CASCADE,
     CONSTRAINT chk_variant_stock CHECK (stock_quantity >= 0),
     CONSTRAINT chk_variant_threshold CHECK (low_stock_threshold >= 0)
@@ -142,8 +157,8 @@ CREATE TABLE product_review (
     product_id INT NOT NULL,
     customer_id INT NOT NULL,
     rating SMALLINT NOT NULL,
-    comment TEXT,
-    -- review will be automatically approved if conditiones met
+    review_comment TEXT,
+    -- review will be automatically approved if conditions met
     is_approved BOOLEAN DEFAULT TRUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pk_product_review PRIMARY KEY (review_id),
@@ -163,7 +178,8 @@ CREATE TABLE cart (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT pk_cart PRIMARY KEY (cart_id),
     CONSTRAINT uq_cart_guest_token UNIQUE (guest_token),
-    CONSTRAINT fk_cart_customer FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE
+    CONSTRAINT fk_cart_customer FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE,
+    CONSTRAINT chk_cart_owner CHECK (customer_id IS NOT NULL OR guest_token IS NOT NULL)
 );
 
 CREATE TABLE cart_item (
@@ -194,6 +210,7 @@ CREATE TABLE customer_order (
     customer_name VARCHAR(100) NOT NULL,
     customer_email VARCHAR(255) NOT NULL,
     customer_phone VARCHAR(20) NOT NULL,
+    -- snapshots are preserved for historical audit integrity / to store "ghost" account orders
     shipping_address_snapshot TEXT NOT NULL,
     shipping_district_snapshot VARCHAR(50) NOT NULL,
     shipping_province_snapshot VARCHAR(50) NOT NULL,
@@ -205,21 +222,8 @@ CREATE TABLE customer_order (
     CONSTRAINT chk_order_status CHECK (order_status IN ('PENDING', 'AWAITING_PAYMENT_VERIFICATION', 'PROCESSING', 'DISPATCHED', 'DELIVERED', 'CANCELLED', 'REFUNDED')),
     CONSTRAINT chk_order_subtotal CHECK (subtotal_amount >= 0),
     CONSTRAINT chk_order_shipping_fee CHECK (shipping_fee >= 0),
-    CONSTRAINT chk_order_total CHECK (total_payable >= 0)
-);
-
--- Module 1: Invoice
-
-CREATE TABLE invoice (
-    invoice_id INT AUTO_INCREMENT,
-    order_id INT NOT NULL,
-    invoice_number VARCHAR(50) NOT NULL,
-    issued_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    pdf_storage_path VARCHAR(255) NOT NULL,
-    CONSTRAINT pk_invoice PRIMARY KEY (invoice_id),
-    CONSTRAINT uq_invoice_order UNIQUE (order_id),
-    CONSTRAINT uq_invoice_number UNIQUE (invoice_number),
-    CONSTRAINT fk_invoice_order FOREIGN KEY (order_id) REFERENCES customer_order(order_id)
+    CONSTRAINT chk_order_total CHECK (total_payable >= 0),
+    CONSTRAINT chk_order_total_balance CHECK (total_payable = subtotal_amount + shipping_fee)
 );
 
 CREATE TABLE order_item (
@@ -236,7 +240,8 @@ CREATE TABLE order_item (
     CONSTRAINT fk_order_item_variant FOREIGN KEY (variant_id) REFERENCES product_variant(variant_id),
     CONSTRAINT chk_order_item_quantity CHECK (quantity > 0),
     CONSTRAINT chk_order_item_unit_price CHECK (unit_price >= 0),
-    CONSTRAINT chk_order_item_subtotal CHECK (subtotal >= 0)
+    CONSTRAINT chk_order_item_subtotal CHECK (subtotal >= 0),
+    CONSTRAINT chk_order_item_subtotal_calc CHECK (subtotal = quantity * unit_price)
 );
 
 CREATE TABLE order_status_history (
@@ -254,6 +259,18 @@ CREATE TABLE order_status_history (
 );
 
 -- Module 4
+
+CREATE TABLE invoice (
+    invoice_id INT AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    invoice_number VARCHAR(50) NOT NULL,
+    issued_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    pdf_storage_path VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_invoice PRIMARY KEY (invoice_id),
+    CONSTRAINT uq_invoice_order UNIQUE (order_id),
+    CONSTRAINT uq_invoice_number UNIQUE (invoice_number),
+    CONSTRAINT fk_invoice_order FOREIGN KEY (order_id) REFERENCES customer_order(order_id)
+);
 
 CREATE TABLE payment (
     payment_id INT AUTO_INCREMENT,
@@ -319,5 +336,6 @@ CREATE TABLE delivery_shipment (
     CONSTRAINT fk_delivery_order FOREIGN KEY (order_id) REFERENCES customer_order(order_id),
     CONSTRAINT fk_delivery_courier FOREIGN KEY (courier_id) REFERENCES courier_partner(courier_id),
     CONSTRAINT chk_delivery_charge CHECK (courier_charge >= 0),
-    CONSTRAINT chk_delivery_status CHECK (delivery_status IN ('PENDING', 'DISPATCHED', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED', 'RETURNED', 'FAILED'))
+    CONSTRAINT chk_delivery_status CHECK (delivery_status IN ('PENDING', 'DISPATCHED', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED', 'RETURNED', 'FAILED')),
+    CONSTRAINT chk_shipment_timeline CHECK (delivered_at IS NULL OR dispatched_at IS NULL OR delivered_at >= dispatched_at)
 );
