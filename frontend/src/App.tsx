@@ -16,14 +16,15 @@ import { SearchModal } from './components/modals/SearchModal';
 import HomePage from './pages/HomePage';
 import CollectionPage from './pages/CollectionPage';
 import ProductDetailPage from './pages/ProductDetailPage';
-import SearchPage from './pages/SearchPage';
 import LoginPage from './pages/LoginPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
+import SearchPage from './pages/SearchPage';
 
 // Module 1 Pages & Providers
 import { AuthProvider } from './modules/module1_user/context/AuthContext';
 import AccountPage from './modules/module1_user/pages/AccountPage';
+import AdminDashboardPage from './modules/module1_user/pages/AdminDashboardPage';
 import InvoicePrintPage from './modules/module1_user/pages/InvoicePrintPage';
 
 function AppShell() {
@@ -54,6 +55,7 @@ function AppShell() {
           <Route path="/account/login" element={<LoginPage />} />
           <Route path="/account/register" element={<LoginPage initialMode="register" />} />
           <Route path="/account" element={<AccountPage />} />
+          <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/invoices/:invoiceNumber" element={<InvoicePrintPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
