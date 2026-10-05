@@ -30,9 +30,9 @@ public class ProductVariant {
     @Column(name = "sku", nullable = false, unique = true, length = 50)
     private String sku;
 
-    // Size of the garment
-    @Column(name = "size", length = 10)
-    private String size;
+    // Size label (size is a reserved keyword in MySQL, so size_label is used)
+    @Column(name = "size_label", nullable = false, length = 10)
+    private String sizeLabel;
 
     // Color of the garment
     @Column(name = "color", length = 30)
@@ -48,16 +48,16 @@ public class ProductVariant {
 
     // Optimistic locking version column to prevent race conditions during checkout
     @Version
-    @Column(name = "version")
-    private Long version;
+    @Column(name = "lock_version")
+    private Integer lockVersion = 0;
 
     public ProductVariant() {
     }
 
-    public ProductVariant(Product product, String sku, String size, String color, Integer stockQuantity, Integer lowStockThreshold) {
+    public ProductVariant(Product product, String sku, String sizeLabel, String color, Integer stockQuantity, Integer lowStockThreshold) {
         this.product = product;
         this.sku = sku;
-        this.size = size;
+        this.sizeLabel = sizeLabel;
         this.color = color;
         this.stockQuantity = stockQuantity;
         this.lowStockThreshold = lowStockThreshold;
@@ -87,12 +87,21 @@ public class ProductVariant {
         this.sku = sku;
     }
 
+    public String getSizeLabel() {
+        return this.sizeLabel;
+    }
+
+    public void setSizeLabel(String sizeLabel) {
+        this.sizeLabel = sizeLabel;
+    }
+
+    // Alias helper to keep existing code and tests calling getSize working
     public String getSize() {
-        return size;
+        return this.sizeLabel;
     }
 
     public void setSize(String size) {
-        this.size = size;
+        this.sizeLabel = size;
     }
 
     public String getColor() {
@@ -119,11 +128,20 @@ public class ProductVariant {
         this.lowStockThreshold = lowStockThreshold;
     }
 
-    public Long getVersion() {
-        return version;
+    public Integer getLockVersion() {
+        return this.lockVersion;
     }
 
-    public void setVersion(Long version) {
-        this.version = version;
+    public void setLockVersion(Integer lockVersion) {
+        this.lockVersion = lockVersion;
+    }
+
+    // Alias helper for getVersion
+    public Integer getVersion() {
+        return this.lockVersion;
+    }
+
+    public void setVersion(Integer version) {
+        this.lockVersion = version;
     }
 }
