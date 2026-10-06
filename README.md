@@ -13,7 +13,7 @@ This project is a web-based order management system built for D'fine, a retail c
 
 - Backend: Java 21, Spring Boot 3
 - Frontend: React (Vite), HTML5, CSS3, JavaScript
-- Database: PostgreSQL 16
+- Database: MySQL 8.0
 - Build and tools: Apache Maven, Git
 
 ## Team members and modules
@@ -24,8 +24,8 @@ The project is split into four functional modules:
 | :--- | :--- | :--- | :--- | :--- |
 | Yapa R. M. J. O. | IT25102762 | Module 1: User management and trend analytics | User authentication, role access control, customer profile, staff accounts, and purchasing analytics | app_user, customer_profile |
 | Fernando T. K. D. | IT25101865 | Module 2: Products and inventory management | Product catalog, categories, size and color variants, SKU tracking, restock logs, and product reviews | category, product, product_variant, restock_log, product_review |
-| Nimradha G. S. | IT25102773 | Module 3: Order handling and cart management | Shopping cart, stock validation, checkout, order tracking, invoice generation, and staff order entry | cart, cart_item, customer_order, order_item |
-| Dilmith P. H. S. | IT25102756 | Module 4: Payment and delivery management | Bank transfer slip verification, shipping fee calculation, courier dispatch, and status tracking | payment, delivery_shipment, courier_partner |
+| Nimradha G. S. | IT25102773 | Module 3: Order handling and cart management | Shopping cart, stock validation, checkout, order tracking and staff order entry | cart, cart_item, customer_order, order_item |
+| Dilmith P. H. S. | IT25102756 | Module 4: Payment and delivery management | Bank transfer slip verification, shipping fee calculation, courier dispatch, invoice generation and status tracking | payment, delivery_shipment, courier_partner, invoice |
 
 ## Repository structure
 
@@ -51,7 +51,7 @@ Clothing-Store-OMS/
 
 ## Development steps
 
-1. Database setup: Write the PostgreSQL schema and test data in `database/` using the entities assigned above.
-2. Backend: Initialize the Spring Boot project in `backend/` with Web, Data JPA, Security, and PostgreSQL dependencies.
+1. Database setup: Write the MySQL schema and test data in `database/` using the entities assigned above.
+2. Backend: Initialize the Spring Boot project in `backend/` with Web, Data JPA, and MySQL dependencies.
 3. Frontend: Initialize the React application in `frontend/` using Vite.
 4. Git workflow: Work in feature branches named by module (`feature/mod1-...`, `feature/mod2-...`) and merge into `main` using pull requests.
