@@ -2,6 +2,7 @@ package com.dfine.oms.module2_product.service;
 
 import com.dfine.oms.module2_product.dto.CategoryResponse;
 import com.dfine.oms.module2_product.dto.CreateCategoryRequest;
+import com.dfine.oms.module2_product.dto.UpdateCategoryRequest;
 
 import java.util.List;
 
@@ -15,4 +16,8 @@ public interface CategoryService {
     CategoryResponse getCategoryById(Integer categoryId);
 
     CategoryResponse createCategory(CreateCategoryRequest request);
+
+    CategoryResponse updateCategory(Integer categoryId, UpdateCategoryRequest request);
+
+    void deleteCategory(Integer categoryId);
 }

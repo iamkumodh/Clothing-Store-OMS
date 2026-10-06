@@ -10,4 +10,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     // check if category name is already taken
     boolean existsByCategoryName(String categoryName);
+
+    // check if another category is already using this name
+    boolean existsByCategoryNameAndCategoryIdNot(String categoryName, Integer categoryId);
 }

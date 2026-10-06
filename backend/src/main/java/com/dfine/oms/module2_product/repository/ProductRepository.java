@@ -18,4 +18,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     // filter products by category and gender target
     List<Product> findByCategory_CategoryIdAndGenderTarget(Integer categoryId, String genderTarget);
+
+    // count how many products belong to a specific category (for safe delete checks)
+    long countByCategory_CategoryId(Integer categoryId);
 }
