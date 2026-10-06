@@ -2,6 +2,7 @@ package com.dfine.oms.module2_product.service;
 
 import com.dfine.oms.module2_product.dto.CreateProductRequest;
 import com.dfine.oms.module2_product.dto.ProductResponse;
+import com.dfine.oms.module2_product.dto.UpdateProductRequest;
 
 import java.util.List;
 
@@ -13,4 +14,8 @@ public interface ProductService {
     ProductResponse getProductById(Integer productId);
 
     ProductResponse createProduct(CreateProductRequest request);
+
+    ProductResponse updateProduct(Integer productId, UpdateProductRequest request);
+
+    void deleteProduct(Integer productId);
 }

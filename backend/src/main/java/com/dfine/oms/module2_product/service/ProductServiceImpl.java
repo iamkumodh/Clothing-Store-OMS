@@ -2,15 +2,19 @@ package com.dfine.oms.module2_product.service;
 
 import com.dfine.oms.module2_product.dto.CreateProductRequest;
 import com.dfine.oms.module2_product.dto.ProductResponse;
+import com.dfine.oms.module2_product.dto.UpdateProductRequest;
 import com.dfine.oms.module2_product.dto.VariantDto;
 import com.dfine.oms.module2_product.entity.Category;
 import com.dfine.oms.module2_product.entity.Product;
 import com.dfine.oms.module2_product.entity.ProductVariant;
 import com.dfine.oms.module2_product.repository.CategoryRepository;
 import com.dfine.oms.module2_product.repository.ProductRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,6 +97,64 @@ public class ProductServiceImpl implements ProductService {
         return mapToResponse(saved);
     }
 
+    // update an exidting product catalog item
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ProductResponse updateProduct(Integer productId, UpdateProductRequest request) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Product not found with id: " + productId));
+
+        if (request.categoryId() != null) {
+            Category category = categoryRepository.findById(request.categoryId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Category not found with id: " + request.categoryId()));
+            product.setCategory(category);
+        }
+
+        if (request.productName() != null && !request.productName().isBlank()) {
+            product.setProductName(request.productName().trim());
+        }
+
+        if (request.description() != null) {
+            product.setProductDescription(request.description());
+        }
+
+        if (request.genderTarget() != null) {
+            product.setGenderTarget(request.genderTarget());
+        }
+
+        if (request.basePrice() != null) {
+            if (request.basePrice().compareTo(BigDecimal.ZERO) < 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Base price cannot be negative");
+            }
+            product.setBasePrice(request.basePrice());
+        }
+
+        if (request.mainImageUrl() != null) {
+            product.setMainImageUrl(request.mainImageUrl());
+        }
+
+        if (request.isActive() != null) {
+            product.setActive(request.isActive());
+        }
+
+        Product updated = productRepository.save(product);
+        return mapToResponse(updated);
+    }
+
+    // soft delete a product (sets is_active to false to protect past orders)
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteProduct(Integer productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found: " + productId));
+        // soft delete: keep row in MySQL for past order history
+        product.setActive(false);
+        productRepository.save(product);
+    }
+
     // helper method to convert entity to response DTO
     private ProductResponse mapToResponse(Product product) {
         Integer catId = null;
@@ -115,8 +177,7 @@ public class ProductServiceImpl implements ProductService {
                     product.getMainImageUrl(),
                     product.isActive(),
                     "OUT_OF_STOCK",
-                    new ArrayList<>()
-            );
+                    new ArrayList<>());
         }
 
         // calculate aggregate stock badge

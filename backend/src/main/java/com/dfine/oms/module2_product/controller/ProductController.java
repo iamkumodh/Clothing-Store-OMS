@@ -2,18 +2,22 @@ package com.dfine.oms.module2_product.controller;
 
 import com.dfine.oms.module2_product.dto.CreateProductRequest;
 import com.dfine.oms.module2_product.dto.ProductResponse;
+import com.dfine.oms.module2_product.dto.UpdateProductRequest;
 import com.dfine.oms.module2_product.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 // REST controller for catalog products
 @RestController
@@ -54,5 +58,21 @@ public class ProductController {
         }
         // return 201 Created for REST standards
         return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
+    // update an existing product item
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductResponse> updateProduct(
+            @PathVariable Integer id,
+            @RequestBody UpdateProductRequest request) {
+        ProductResponse updated = productService.updateProduct(id, request);
+        return ResponseEntity.ok(updated);
+    }
+
+    // soft delete a product item
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteProduct(@PathVariable Integer id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.ok(Map.of("message", "Product deleted successfully"));
     }
 }
