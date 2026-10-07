@@ -34,9 +34,28 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponse> getAllProducts(Integer categoryId, String gender) {
+        return getAllProducts(categoryId, gender, null);
+    }
+
+    // search and filter products by category, gender, and keyword
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductResponse> getAllProducts(Integer categoryId, String gender, String search) {
         List<Product> products;
 
-        if (categoryId != null && gender != null) {
+        if (search != null && !search.trim().isEmpty()) {
+            products = productRepository.searchProducts(search.trim());
+            if (categoryId != null) {
+                products = products.stream()
+                        .filter(p -> p.getCategory() != null && categoryId.equals(p.getCategory().getCategoryId()))
+                        .toList();
+            }
+            if (gender != null) {
+                products = products.stream()
+                        .filter(p -> gender.equalsIgnoreCase(p.getGenderTarget()))
+                        .toList();
+            }
+        } else if (categoryId != null && gender != null) {
             products = productRepository.findByCategory_CategoryIdAndGenderTarget(categoryId, gender);
         } else if (categoryId != null) {
             products = productRepository.findByCategory_CategoryId(categoryId);

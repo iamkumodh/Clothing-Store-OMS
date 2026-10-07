@@ -30,12 +30,13 @@ public class ProductController {
         this.productService = productService;
     }
 
-    // get products list with optional category and gender filter
+    // get products list with optional category, gender, and search filter
     @GetMapping
     public ResponseEntity<List<ProductResponse>> getProducts(
             @RequestParam(required = false) Integer categoryId,
-            @RequestParam(required = false) String gender) {
-        List<ProductResponse> products = productService.getAllProducts(categoryId, gender);
+            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) String search) {
+        List<ProductResponse> products = productService.getAllProducts(categoryId, gender, search);
         return ResponseEntity.ok(products);
     }
 

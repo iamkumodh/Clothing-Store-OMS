@@ -11,6 +11,8 @@ public interface ProductService {
 
     List<ProductResponse> getAllProducts(Integer categoryId, String gender);
 
+    List<ProductResponse> getAllProducts(Integer categoryId, String gender, String search);
+
     ProductResponse getProductById(Integer productId);
 
     ProductResponse createProduct(CreateProductRequest request);
