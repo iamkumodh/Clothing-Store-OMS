@@ -21,10 +21,11 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     // filter products by category and gender target
     List<Product> findByCategory_CategoryIdAndGenderTarget(Integer categoryId, String genderTarget);
 
-    // count how many products belong to a specific category (for safe delete checks)
+    // count how many products belong to a specific category (for safe delete
+    // checks)
     long countByCategory_CategoryId(Integer categoryId);
 
-    // search products across name and description by keyword
-    @Query("SELECT p FROM Product p WHERE p.productName LIKE %:keyword% OR p.productDescription LIKE %:keyword%")
+    // search products by name and description by keyword (case-insensitive)
+    @Query("SELECT p FROM Product p WHERE LOWER(p.productName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(p.productDescription) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Product> searchProducts(@Param("keyword") String keyword);
 }

@@ -44,7 +44,9 @@ public class ProductServiceImpl implements ProductService {
         List<Product> products;
 
         if (search != null && !search.trim().isEmpty()) {
-            products = productRepository.searchProducts(search.trim());
+            // sanitize search query using regex to strip special characters
+            String cleanKeyword = search.trim().replaceAll("[^a-zA-Z0-9]", "");
+            products = productRepository.searchProducts(cleanKeyword);
             if (categoryId != null) {
                 products = products.stream()
                         .filter(p -> p.getCategory() != null && categoryId.equals(p.getCategory().getCategoryId()))
