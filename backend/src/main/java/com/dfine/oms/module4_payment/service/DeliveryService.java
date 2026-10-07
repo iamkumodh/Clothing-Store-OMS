@@ -45,15 +45,12 @@ public class DeliveryService {
         // Check if a shipment already exists for this order
         DeliveryShipment shipment = deliveryRepository.findByOrderId(request.orderId()).orElse(new DeliveryShipment());
 
-        System.out.println("DEBUG: Dispatching order " + request.orderId() + " with courier " + courier.getCourierName());
-
-        String tracking = request.trackingNumber();
-        if (tracking == null || tracking.isBlank()) {
-            tracking = "SHIP-" + request.orderId();
-        }
+        String tracking = (request.trackingNumber() != null && !request.trackingNumber().isBlank())
+                ? request.trackingNumber().trim()
+                : "TRK-" + System.currentTimeMillis() + "-" + (int)(Math.random() * 900 + 100);
 
         BigDecimal charge = request.courierCharge() != null ? request.courierCharge() : new BigDecimal("350.00");
-        String location = request.initialLocation() != null ? request.initialLocation() : "Central Warehouse";
+        String location = request.initialLocation() != null ? request.initialLocation() : "D-Fine Central Fulfillment Center, Colombo";
 
         shipment.setOrderId(request.orderId());
         shipment.setCourierId(courier.getCourierId());
