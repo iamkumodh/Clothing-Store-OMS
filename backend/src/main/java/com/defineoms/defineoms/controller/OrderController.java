@@ -2,6 +2,7 @@ package com.defineoms.defineoms.controller;
 
 import com.defineoms.defineoms.entity.CustomerOrder;
 import com.defineoms.defineoms.entity.OrderItem;
+import com.defineoms.defineoms.entity.OrderStatusHistory;
 import com.defineoms.defineoms.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +39,8 @@ public class OrderController {
         return orderService.getOrderItems(orderId);
     }
 
-    @GetMapping("/test-order")
-    public String testOrder() {
-        return "Order service active";
+    @GetMapping("/{orderId}/history")
+    public List<OrderStatusHistory> getStatusHistory(@PathVariable Integer orderId) {
+        return orderService.getStatusHistory(orderId);
     }
 }

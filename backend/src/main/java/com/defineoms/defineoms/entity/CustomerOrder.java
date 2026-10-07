@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "customer_order")
+
 public class CustomerOrder {
 
     @Id
@@ -14,75 +15,139 @@ public class CustomerOrder {
 
     private String orderNumber;
     private Integer customerId;
+
+    private Integer assistedByStaffId;
+
     private LocalDateTime orderDate;
     private String orderSource;
     private String orderStatus;
+
     private BigDecimal subtotalAmount;
     private BigDecimal shippingFee;
     private BigDecimal totalPayable;
+
     private String customerName;
     private String customerEmail;
     private String customerPhone;
+
     private String shippingAddressSnapshot;
     private String shippingDistrictSnapshot;
     private String shippingProvinceSnapshot;
 
-    // temporary helper methods for status and total check
-    @Transient
-    public boolean isPendingOrder() {
-        return "PENDING".equalsIgnoreCase(this.orderStatus);
-    }
-
-    @Transient
-    public BigDecimal computeSimpleTotal() {
-        if (this.subtotalAmount == null) return BigDecimal.ZERO;
-        return this.subtotalAmount.add(this.shippingFee != null ? this.shippingFee : BigDecimal.ZERO);
-    }
-
     public CustomerOrder() {}
 
-    public Integer getOrderId() { return orderId; }
-    public void setOrderId(Integer orderId) { this.orderId = orderId; }
+    public Integer getOrderId() {
+        return orderId;
+    }
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
 
-    public String getOrderNumber() { return orderNumber; }
-    public void setOrderNumber(String orderNumber) { this.orderNumber = orderNumber; }
+    public String getOrderNumber() {
+        return orderNumber;
+    }
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
+    }
 
-    public Integer getCustomerId() { return customerId; }
-    public void setCustomerId(Integer customerId) { this.customerId = customerId; }
+    public Integer getCustomerId() {
+        return customerId;
+    }
+    public void setCustomerId(Integer customerId) {
+        this.customerId = customerId;
+    }
 
-    public LocalDateTime getOrderDate() { return orderDate; }
-    public void setOrderDate(LocalDateTime orderDate) { this.orderDate = orderDate; }
+    public Integer getAssistedByStaffId() {
+        return assistedByStaffId;
+    }
+    public void setAssistedByStaffId(Integer assistedByStaffId) {
+        this.assistedByStaffId = assistedByStaffId;
+    }
 
-    public String getOrderSource() { return orderSource; }
-    public void setOrderSource(String orderSource) { this.orderSource = orderSource; }
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
+    }
 
-    public String getOrderStatus() { return orderStatus; }
-    public void setOrderStatus(String orderStatus) { this.orderStatus = orderStatus; }
+    public String getOrderSource() {
+        return orderSource;
+    }
 
-    public BigDecimal getSubtotalAmount() { return subtotalAmount; }
-    public void setSubtotalAmount(BigDecimal subtotalAmount) { this.subtotalAmount = subtotalAmount; }
+    public void setOrderSource(String orderSource) {
+        this.orderSource = orderSource;
+    }
 
-    public BigDecimal getShippingFee() { return shippingFee; }
-    public void setShippingFee(BigDecimal shippingFee) { this.shippingFee = shippingFee; }
+    public String getOrderStatus() {
+        return orderStatus;
+    }
 
-    public BigDecimal getTotalPayable() { return totalPayable; }
-    public void setTotalPayable(BigDecimal totalPayable) { this.totalPayable = totalPayable; }
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
+    }
 
-    public String getCustomerName() { return customerName; }
-    public void setCustomerName(String customerName) { this.customerName = customerName; }
+    public BigDecimal getSubtotalAmount() {
+        return subtotalAmount;
+    }
+    public void setSubtotalAmount(BigDecimal subtotalAmount) {
+        this.subtotalAmount = subtotalAmount;
+    }
 
-    public String getCustomerEmail() { return customerEmail; }
-    public void setCustomerEmail(String customerEmail) { this.customerEmail = customerEmail; }
+    public BigDecimal getShippingFee() {
+        return shippingFee;
+    }
+    public void setShippingFee(BigDecimal shippingFee) {
+        this.shippingFee = shippingFee;
+    }
 
-    public String getCustomerPhone() { return customerPhone; }
-    public void setCustomerPhone(String customerPhone) { this.customerPhone = customerPhone; }
+    public BigDecimal getTotalPayable() {
+        return totalPayable;
+    }
+    public void setTotalPayable(BigDecimal totalPayable) {
+        this.totalPayable = totalPayable;
+    }
 
-    public String getShippingAddressSnapshot() { return shippingAddressSnapshot; }
-    public void setShippingAddressSnapshot(String shippingAddressSnapshot) { this.shippingAddressSnapshot = shippingAddressSnapshot; }
+    public String getCustomerName() {
+        return customerName;
+    }
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
 
-    public String getShippingDistrictSnapshot() { return shippingDistrictSnapshot; }
-    public void setShippingDistrictSnapshot(String shippingDistrictSnapshot) { this.shippingDistrictSnapshot = shippingDistrictSnapshot; }
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
+    }
 
-    public String getShippingProvinceSnapshot() { return shippingProvinceSnapshot; }
-    public void setShippingProvinceSnapshot(String shippingProvinceSnapshot) { this.shippingProvinceSnapshot = shippingProvinceSnapshot; }
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+    public void setCustomerPhone(String customerPhone) {
+        this.customerPhone = customerPhone;
+    }
+
+    public String getShippingAddressSnapshot() {
+        return shippingAddressSnapshot;
+    }
+    public void setShippingAddressSnapshot(String v) {
+        this.shippingAddressSnapshot = v;
+    }
+
+    public String getShippingDistrictSnapshot() {
+        return shippingDistrictSnapshot;
+    }
+    public void setShippingDistrictSnapshot(String v) {
+        this.shippingDistrictSnapshot = v;
+    }
+
+    public String getShippingProvinceSnapshot() {
+        return shippingProvinceSnapshot;
+    }
+    public void setShippingProvinceSnapshot(String v) {
+        this.shippingProvinceSnapshot = v;
+    }
 }
+
