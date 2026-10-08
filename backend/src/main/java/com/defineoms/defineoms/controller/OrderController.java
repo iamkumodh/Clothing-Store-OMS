@@ -7,6 +7,7 @@ import com.defineoms.defineoms.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import com.defineoms.defineoms.dto.OrderResponse;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -24,13 +25,12 @@ public class OrderController {
                                   @RequestParam String shippingAddress,
                                   @RequestParam String shippingDistrict,
                                   @RequestParam String shippingProvince) {
-
         return orderService.checkout(cartId, customerId, customerName, customerEmail,
                 customerPhone, shippingAddress, shippingDistrict, shippingProvince);
     }
 
     @GetMapping("/customer/{customerId}")
-    public List<CustomerOrder> getMyOrders(@PathVariable Integer customerId) {
+    public List<CustomerOrder> getOrderHistory(@PathVariable Integer customerId) {
         return orderService.getOrderHistory(customerId);
     }
 
@@ -42,5 +42,20 @@ public class OrderController {
     @GetMapping("/{orderId}/history")
     public List<OrderStatusHistory> getStatusHistory(@PathVariable Integer orderId) {
         return orderService.getStatusHistory(orderId);
+    }
+
+
+    @PutMapping("/{orderId}/status")
+    public CustomerOrder updateStatus(@PathVariable Integer orderId,
+                                      @RequestParam String newStatus,
+                                      @RequestParam(required = false) Integer changedByUserId,
+                                      @RequestParam(required = false) String note) {
+        return orderService.updateStatus(orderId, newStatus, changedByUserId, note);
+    }
+
+
+    @GetMapping("/{orderId}/full")
+    public OrderResponse getFullOrder(@PathVariable Integer orderId) {
+        return orderService.buildOrderResponse(orderId);
     }
 }

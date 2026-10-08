@@ -9,6 +9,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import com.defineoms.defineoms.dto.OrderResponse;
+import com.defineoms.defineoms.dto.OrderItemResponse;
+import java.util.ArrayList;
 
 @Service
 public class OrderService {
@@ -109,4 +112,60 @@ public class OrderService {
     public List<OrderStatusHistory> getStatusHistory(Integer orderId) {
         return historyRepository.findByOrderIdOrderByChangedAtAsc(orderId);
     }
+
+
+
+    @Transactional
+    public CustomerOrder updateStatus(Integer orderId, String newStatus,
+                                      Integer changedByUserId, String note) {
+
+        Optional<CustomerOrder> orderBox = orderRepository.findById(orderId);
+        if (!orderBox.isPresent()) {
+            throw new RuntimeException("Order not found");
+        }
+
+        CustomerOrder order = orderBox.get();
+        String previousStatus = order.getOrderStatus();
+
+        order.setOrderStatus(newStatus);
+        CustomerOrder updatedOrder = orderRepository.save(order);
+
+        OrderStatusHistory entry = new OrderStatusHistory();
+        entry.setOrderId(orderId);
+        entry.setChangedByUserId(changedByUserId);
+        entry.setPreviousStatus(previousStatus);
+        entry.setNewStatus(newStatus);
+        entry.setChangedAt(LocalDateTime.now());
+        entry.setNotes(note);
+        historyRepository.save(entry);
+
+        return updatedOrder;
+    }
+    public OrderResponse buildOrderResponse(Integer orderId) {
+
+        CustomerOrder order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        List<OrderItem> items = orderItemRepository.findByOrderId(orderId);
+        List<OrderItemResponse> itemResponses = new ArrayList<>();
+
+        for (OrderItem item : items) {
+            itemResponses.add(new OrderItemResponse(
+                    item.getOrderItemId(),
+                    item.getVariantId(),
+                    item.getQuantity(),
+                    item.getUnitPrice(),
+                    item.getSubtotal()
+            ));
+        }
+
+        return new OrderResponse(
+                order.getOrderId(),
+                order.getOrderNumber(),
+                order.getOrderStatus(),
+                order.getTotalPayable(),
+                itemResponses
+        );
+    }
+
 }
