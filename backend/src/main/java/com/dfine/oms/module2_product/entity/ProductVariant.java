@@ -46,6 +46,10 @@ public class ProductVariant {
     @Column(name = "low_stock_threshold")
     private Integer lowStockThreshold = 5;
 
+    // Image specific to this color or variant
+    @Column(name = "variant_image_url")
+    private String variantImageUrl;
+
     // Optimistic locking version column to prevent race conditions during checkout
     @Version
     @Column(name = "lock_version")
@@ -143,5 +147,13 @@ public class ProductVariant {
 
     public void setVersion(Integer version) {
         this.lockVersion = version;
+    }
+
+    public String getVariantImageUrl() {
+        return variantImageUrl;
+    }
+
+    public void setVariantImageUrl(String variantImageUrl) {
+        this.variantImageUrl = variantImageUrl;
     }
 }
