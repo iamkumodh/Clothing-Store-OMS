@@ -31,15 +31,9 @@ public class PaymentController {
         this.codService = codService;
     }
 
-    // helper method to log payment activity
-    private void logPaymentActivity(String action, Integer id) {
-        System.out.println("[AUDIT] Payment " + action + " for ID: " + id);
-    }
-
     // Creates payment upon order checkout
     @PostMapping
     public ResponseEntity<Payment> createPayment(@Valid @RequestBody CreatePaymentRequest request) {
-        logPaymentActivity("CREATE_REQUEST", request.orderId());
         Payment saved = paymentService.createPayment(request);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
