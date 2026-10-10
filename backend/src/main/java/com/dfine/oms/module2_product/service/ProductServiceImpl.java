@@ -94,13 +94,11 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(rollbackFor = Exception.class)
     public ProductResponse createProduct(CreateProductRequest request) {
         if (request.categoryId() == null || request.productName() == null || request.productName().isBlank()) {
-            return null;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Category ID and product name are required");
         }
 
-        Category category = categoryRepository.findById(request.categoryId()).orElse(null);
-        if (category == null) {
-            return null;
-        }
+        Category category = categoryRepository.findById(request.categoryId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found with id: " + request.categoryId()));
 
         Product product = new Product();
         product.setCategory(category);
