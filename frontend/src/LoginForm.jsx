@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-export default function LoginForm({ onLoginSuccess }) {
+export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const navigate = useNavigate(); // 1. Initialize the navigate hook
+  const navigate = useNavigate(); 
 
   const handleLogin = (e) => {
     e.preventDefault(); 
@@ -30,25 +30,19 @@ export default function LoginForm({ onLoginSuccess }) {
           }
           
           const decodedPayload = JSON.parse(atob(base64));
-          
-          // Use 'role' because that is exactly what JwtUtil calls it
           const userRole = decodedPayload.role; 
           
           localStorage.setItem("role", userRole); 
 
-          // Update the condition to match the exact string from your database
-          if (userRole === 'ADMIN' || userRole === 'STORE_STAFF') {
-              navigate('/dashboard');
+          if (userRole === 'ADMIN' || userRole === 'ADMIN_SUPER' || userRole === 'MANAGER' || userRole === 'STORE_STAFF') {
+              navigate('/admin/dashboard'); 
           } else {
-              navigate('/');
+              navigate('/'); 
           }
-
         } catch (error) {
           console.error("Failed to decode token role", error);
-          navigate('/'); // Fallback for standard users if decoding fails
+          navigate('/'); 
         }
-
-        if (onLoginSuccess) onLoginSuccess();
       } else {
         setMessage(`❌ Error: ${text}`);
       }

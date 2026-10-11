@@ -7,15 +7,16 @@ export default function AdminPortal() {
   
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // Updated state to only track valid staff fields
   const [profile, setProfile] = useState({
-    firstName: '', lastName: '', contactNumber: '',
-    shippingAddress: '', city: '', district: '', province: '', postalCode: ''
+    firstName: '', lastName: '', designation: '', clearanceLevel: ''
   });
   const [message, setMessage] = useState('');
 
   const [newStaff, setNewStaff] = useState({
     firstName: '', lastName: '', email: '', password: '',
-    designation: 'Cashier', clearanceLevel: 'STAFF_STANDARD'
+    designation: 'Cashier', clearanceLevel: 'TIER_1'
   });
   const [staffMessage, setStaffMessage] = useState('');
 
@@ -32,7 +33,7 @@ export default function AdminPortal() {
         const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
         
         const [profileRes, analyticsRes] = await Promise.all([
-          fetch('http://localhost:8080/api/profile', { headers }),
+          fetch('http://localhost:8080/api/admin/profile', { headers }), // Updated endpoint & added missing comma
           fetch('http://localhost:8080/api/admin/analytics/dashboard', { headers })
         ]);
 
@@ -61,10 +62,17 @@ export default function AdminPortal() {
   const handleProfileUpdate = (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
-    fetch('http://localhost:8080/api/profile', {
+    
+    // Create a clean payload containing ONLY the strings the backend expects
+    const updatePayload = {
+      firstName: profile.firstName,
+      lastName: profile.lastName
+    };
+    
+    fetch('http://localhost:8080/api/admin/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify(profile)
+      body: JSON.stringify(updatePayload) // Send the clean payload instead of the whole profile
     })
     .then(async res => {
       const text = await res.text();
@@ -85,7 +93,7 @@ export default function AdminPortal() {
       const text = await res.text();
       if (res.ok) {
         setStaffMessage(`✅ Staff registered successfully!`);
-        setNewStaff({ firstName: '', lastName: '', email: '', password: '', designation: 'Cashier', clearanceLevel: 'STAFF_STANDARD' });
+        setNewStaff({ firstName: '', lastName: '', email: '', password: '', designation: 'Cashier', clearanceLevel: 'TIER_1' });
       } else {
         setStaffMessage(`❌ Error: ${text}`);
       }
@@ -184,9 +192,13 @@ export default function AdminPortal() {
               </div>
               <div style={{ flex: 1 }}>
                 <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#555' }}>Clearance Level</label>
-                <select style={{ padding: '8px', width: '100%', marginTop: '5px', boxSizing: 'border-box' }} value={newStaff.clearanceLevel} onChange={e => setNewStaff({...newStaff, clearanceLevel: e.target.value})}>
-                  <option value="STAFF_STANDARD">Standard Staff</option>
-                  <option value="STAFF_MANAGER">Manager</option>
+                <select 
+                  style={{ padding: '8px', width: '100%', marginTop: '5px', boxSizing: 'border-box' }} 
+                  value={newStaff.clearanceLevel} 
+                  onChange={e => setNewStaff({...newStaff, clearanceLevel: e.target.value})}
+                >
+                  <option value="TIER_1">Standard Staff</option>
+                  <option value="TIER_2">Manager</option>
                   <option value="ADMIN_SUPER">Super Admin</option>
                 </select>
               </div>
@@ -205,22 +217,29 @@ export default function AdminPortal() {
           <h3 style={{ marginTop: 0 }}>My Profile</h3>
           {message && <div style={{ marginBottom: '15px', padding: '10px', background: '#e3f2fd', borderRadius: '4px' }}><strong>{message}</strong></div>}
           
-          <form onSubmit={handleProfileUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <form onSubmit={handleProfileUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <input type="text" name="firstName" value={profile.firstName || ''} onChange={e => setProfile({...profile, firstName: e.target.value})} placeholder="First Name" required style={{ padding: '8px', flex: 1 }} />
-              <input type="text" name="lastName" value={profile.lastName || ''} onChange={e => setProfile({...profile, lastName: e.target.value})} placeholder="Last Name" required style={{ padding: '8px', flex: 1 }} />
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#555' }}>First Name</label>
+                <input type="text" name="firstName" value={profile.firstName || ''} onChange={e => setProfile({...profile, firstName: e.target.value})} required style={{ padding: '8px', width: '100%', marginTop: '5px', boxSizing: 'border-box' }} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#555' }}>Last Name</label>
+                <input type="text" name="lastName" value={profile.lastName || ''} onChange={e => setProfile({...profile, lastName: e.target.value})} required style={{ padding: '8px', width: '100%', marginTop: '5px', boxSizing: 'border-box' }} />
+              </div>
             </div>
-            <input type="tel" name="contactNumber" value={profile.contactNumber || ''} onChange={e => setProfile({...profile, contactNumber: e.target.value})} placeholder="Contact Number" required style={{ padding: '8px' }} />
-            <h4 style={{ margin: '10px 0 0 0' }}>Shipping Address</h4>
-            <input type="text" name="shippingAddress" value={profile.shippingAddress || ''} onChange={e => setProfile({...profile, shippingAddress: e.target.value})} placeholder="Street Address" required style={{ padding: '8px' }} />
+            
             <div style={{ display: 'flex', gap: '10px' }}>
-              <input type="text" name="city" value={profile.city || ''} onChange={e => setProfile({...profile, city: e.target.value})} placeholder="City" required style={{ padding: '8px', flex: 1 }} />
-              <input type="text" name="district" value={profile.district || ''} onChange={e => setProfile({...profile, district: e.target.value})} placeholder="District" required style={{ padding: '8px', flex: 1 }} />
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#555' }}>Designation (Read Only)</label>
+                <input type="text" value={profile.designation || ''} disabled style={{ padding: '8px', width: '100%', marginTop: '5px', boxSizing: 'border-box', background: '#e0e0e0' }} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#555' }}>Clearance Level (Read Only)</label>
+                <input type="text" value={profile.clearanceLevel || ''} disabled style={{ padding: '8px', width: '100%', marginTop: '5px', boxSizing: 'border-box', background: '#e0e0e0' }} />
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <input type="text" name="province" value={profile.province || ''} onChange={e => setProfile({...profile, province: e.target.value})} placeholder="Province" required style={{ padding: '8px', flex: 1 }} />
-              <input type="text" name="postalCode" value={profile.postalCode || ''} onChange={e => setProfile({...profile, postalCode: e.target.value})} placeholder="Postal Code" style={{ padding: '8px', flex: 1 }} />
-            </div>
+
             <button type="submit" style={{ padding: '12px', background: '#1976d2', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '10px', fontWeight: 'bold' }}>
               Update Profile
             </button>

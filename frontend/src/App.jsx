@@ -7,7 +7,6 @@ import ForgotPassword from './ForgotPassword';
 import ResetPassword from './ResetPassword';
 
 function App() {
-  // Registration form states
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [firstName, setFirstName] = useState('')
@@ -41,7 +40,6 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Home */}
         <Route path="/" element={
           <div style={{ padding: '30px', fontFamily: 'Arial, sans-serif', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #eee', paddingBottom: '20px', marginBottom: '20px' }}>
@@ -58,40 +56,25 @@ function App() {
           </div>
         } />
 
-        {/* Public Login Route */}
         <Route path="/login" element={
           <div style={{ padding: '30px', fontFamily: 'Arial, sans-serif', maxWidth: '600px', margin: '0 auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h2>D'fine</h2>
-              <a 
-                href="/register" 
-                style={{ padding: '8px 16px', background: '#333', color: 'white', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}
-              >
+              <a href="/register" style={{ padding: '8px 16px', background: '#333', color: 'white', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}>
                 Go to Register
               </a>
             </div>
-
-            <LoginForm onLoginSuccess={() => {
-              const role = localStorage.getItem('role'); 
-  
-              if (role === 'STORE_STAFF' || role === 'ADMIN') {
-                window.location.href = '/admin/dashboard';
-              } else {
-                window.location.href = '/';
-              }
-            }} />
+            
+            {/* Removed the onLoginSuccess prop completely */}
+            <LoginForm />
           </div>
         } />
 
-        {/* Public Registration Route */}
         <Route path="/register" element={
           <div style={{ padding: '30px', fontFamily: 'Arial, sans-serif', maxWidth: '600px', margin: '0 auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h2>D'fine</h2>
-              <a 
-                href="/login" 
-                style={{ padding: '8px 16px', background: '#333', color: 'white', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}
-              >
+              <a href="/login" style={{ padding: '8px 16px', background: '#333', color: 'white', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}>
                 Go to Login
               </a>
             </div>
@@ -128,19 +111,9 @@ function App() {
           </div>
         } />
 
-        {/* Admin Dashboard */}
-        <Route 
-            path="/admin/dashboard" 
-            element={
-                <ProtectedRoute>
-                    <AdminDashboard />
-                </ProtectedRoute>
-    } 
-/>
-
+        <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        
       </Routes>
     </Router>
   )

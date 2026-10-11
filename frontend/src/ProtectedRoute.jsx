@@ -1,19 +1,19 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate } from 'react-router-dom';
 
-const ProtectedRoute = ({ children, requiredRole }) => {
-  const token = localStorage.getItem("token");
-  const userRole = localStorage.getItem("role");
+export default function ProtectedRoute({ children }) {
+  const token = localStorage.getItem('token');
+  const role = localStorage.getItem('role');
 
   if (!token) {
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && userRole !== requiredRole) {
-    return <Navigate to="/" replace />;
+  // Ensure all your staff clearance levels are authorized here
+  const allowedRoles = ['ADMIN', 'ADMIN_SUPER', 'MANAGER', 'STORE_STAFF'];
+  
+  if (!allowedRoles.includes(role)) {
+    return <Navigate to="/" replace />; // Sends unauthorized users to the storefront
   }
 
   return children;
-};
-
-export default ProtectedRoute;
+}
