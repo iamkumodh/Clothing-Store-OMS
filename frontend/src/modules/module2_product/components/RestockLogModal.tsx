@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { mockDb } from '../../../api/mockDataStore';
 import type { ProductVariant, StoreStaff, RestockLog } from '../../../types/oms';
-import { X, ArrowDownToLine, CheckCircle2, History, AlertCircle } from 'lucide-react';
+import { X, ArrowDownToLine, CheckCircle2, History } from 'lucide-react';
 
 interface RestockLogModalProps {
   isOpen: boolean;
@@ -36,7 +36,6 @@ export function RestockLogModal({
   if (!isOpen) return null;
 
   const currentVariant = variants.find((v) => v.variantId === selectedVariantId);
-  const product = currentVariant ? mockDb.getProductById(currentVariant.productId) : null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

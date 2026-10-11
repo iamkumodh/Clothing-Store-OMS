@@ -20,8 +20,6 @@ import {
   CheckCircle2,
   AlertCircle,
   User,
-  CreditCard,
-  Truck,
   Sparkles,
 } from 'lucide-react';
 
@@ -60,7 +58,7 @@ export function AssistedOrderModal({
   const [shippingDistrict, setShippingDistrict] = useState<string>('Colombo');
   const [shippingProvince, setShippingProvince] = useState<string>('Western');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH_ON_DELIVERY');
-  const [courierPartnerId, setCourierPartnerId] = useState<number>(1);
+  const [courierPartnerId] = useState<number>(1);
   const [notes, setNotes] = useState<string>('Walk-in POS purchase settled at cashier terminal');
 
   // Line items state
@@ -412,7 +410,6 @@ export function AssistedOrderModal({
                 <div className="space-y-2 border border-zinc-200 p-3 bg-zinc-50">
                   {lineItems.map((item, idx) => {
                     const v = variantMap.get(item.variantId);
-                    const prod = v ? productMap.get(v.productId) : null;
 
                     return (
                       <div

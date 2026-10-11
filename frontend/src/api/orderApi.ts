@@ -3,7 +3,6 @@
 import { apiClient, executeWithFallback } from './client';
 import { mockDb } from './mockDataStore';
 import type {
-  CustomerOrder,
   CustomerOrderWithDetails,
   CreateOrderDto,
   UpdateOrderStatusDto,

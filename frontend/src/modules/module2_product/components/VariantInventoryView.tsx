@@ -6,14 +6,11 @@ import type { ProductVariant, Product, Category } from '../../../types/oms';
 import { RestockLogModal } from './RestockLogModal';
 import {
   Search,
-  Filter,
   AlertTriangle,
   ArrowDownToLine,
   CheckCircle2,
   XCircle,
   Package,
-  Layers,
-  RefreshCw,
 } from 'lucide-react';
 
 export function VariantInventoryView() {

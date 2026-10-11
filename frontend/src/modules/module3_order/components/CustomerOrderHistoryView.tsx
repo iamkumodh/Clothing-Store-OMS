@@ -6,13 +6,10 @@ import type { CustomerOrderWithDetails, OrderStatus } from '../../../types/oms';
 import { cancelCustomerOrder } from '../../../api/orderApi';
 import {
   Package,
-  Calendar,
   Truck,
   CheckCircle2,
-  Clock,
   AlertTriangle,
   RotateCcw,
-  ExternalLink,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';

@@ -7,14 +7,9 @@ import { submitBankTransfer, verifyBankTransfer, BankTransferResponse } from '..
 import { LiveTrackingModal } from '../modules/module4_payment/components/LiveTrackingModal';
 import {
   CheckCircle,
-  Clock,
   UploadCloud,
   FileCheck,
-  ShieldAlert,
-  ArrowRight,
   Printer,
-  ShoppingBag,
-  ExternalLink,
   Building,
   CheckCircle2,
   AlertCircle,

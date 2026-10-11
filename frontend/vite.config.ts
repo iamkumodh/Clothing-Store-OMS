@@ -30,9 +30,6 @@ export default defineConfig({
             if (id.includes('lucide-react')) {
               return 'vendor-icons';
             }
-            if (id.includes('@base-ui')) {
-              return 'vendor-ui';
-            }
             return 'vendor-libs';
           }
         },

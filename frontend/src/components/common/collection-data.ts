@@ -1,6 +1,6 @@
 import { Product } from './types';
 
-export const collection2026Products: Product[] = [
+export const dfineCollectionProducts: Product[] = [
   // --- UNISEX LINE ---
   {
     id: 'coll-tee-1',
@@ -429,5 +429,3 @@ export const collection2026Products: Product[] = [
     features: ['Subtle botanical typography', 'Relaxed oversized fit', 'Soft combed cotton jersey'],
   },
 ];
-
-export const dfineCollectionProducts = collection2026Products;

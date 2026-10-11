@@ -12,17 +12,11 @@ import { OrderDetailModal } from './OrderDetailModal';
 import { AssistedOrderModal } from './AssistedOrderModal';
 import {
   Search,
-  Filter,
   Package,
   Plus,
   Eye,
-  Calendar,
   Clock,
-  CheckCircle2,
-  AlertCircle,
   Truck,
-  RotateCcw,
-  Sparkles,
 } from 'lucide-react';
 
 export function OrderManagementView() {

@@ -10,9 +10,7 @@ import {
   Clock,
   ShieldCheck,
   Search,
-  Filter,
   MessageSquare,
-  Sparkles,
 } from 'lucide-react';
 
 export function ReviewModerationView() {

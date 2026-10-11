@@ -5,7 +5,6 @@ import { mockDb } from '../../../api/mockDataStore';
 import type {
   Payment,
   BankTransferPayment,
-  CashOnDeliveryPayment,
   CustomerOrderWithDetails,
   CodCollectionStatus,
 } from '../../../types/oms';
@@ -16,12 +15,8 @@ import {
   XCircle,
   Clock,
   Search,
-  Filter,
   Eye,
-  FileText,
-  AlertCircle,
   Truck,
-  ArrowRight,
   ShieldCheck,
   X,
   ZoomIn,
