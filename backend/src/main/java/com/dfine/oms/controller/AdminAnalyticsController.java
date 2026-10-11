@@ -15,7 +15,7 @@ public class AdminAnalyticsController {
     private AnalyticsService analyticsService;
 
     @GetMapping("/dashboard")
-    public ResponseEntity<AnalyticsSummary> getDashboardData() {
+    public ResponseEntity<?> getDashboardData() {
         AnalyticsSummary summary = analyticsService.getStoreAnalytics();
         return ResponseEntity.ok(summary);
     }

@@ -41,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (jwtUtil.validateToken(jwt)) {
             String email = jwtUtil.extractEmail(jwt);
             String role = jwtUtil.extractRole(jwt); // extract the role claim from the token
+            System.out.println("=== THE JWT ROLE IS: [" + role + "] ===");
 
             // if the token is valid and no one is currently logged in to this request thread
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
