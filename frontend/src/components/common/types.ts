@@ -31,6 +31,10 @@ export interface Product {
   hoverImage?: string;
   images?: string[];
   category: string;
+  gender?: 'MEN' | 'WOMEN' | 'UNISEX';
+  gsm?: number;
+  fit?: 'Oversized' | 'Relaxed' | 'Classic' | 'Boxy Cropped';
+  neckline?: string;
   badge?: string;
   colors?: string[];
   sizes?: string[];

@@ -1,5 +1,5 @@
 /**
- * Shoppable Hero Banner Section
+ * Shoppable Hero Banner Section - T-Shirt Brand Campaign
  */
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -12,18 +12,13 @@ export function ShoppableHeroSection() {
   const { addToCart } = useDfineStore();
 
   return (
-    <section className="relative w-full bg-[#f4f2ee] overflow-hidden select-none">
-      {/* 
-        Official D'fine Media Container:
-        Responsive aspect ratio: 1000/1087 on mobile, 1582/994 on desktop
-        Preserves top sunlit wall space so the D'fine logo never collides with models' heads.
-      */}
+    <section className="relative w-full bg-white overflow-hidden select-none">
       <div className="relative w-full aspect-[1000/1087] sm:aspect-[1582/994] overflow-hidden">
         {/* Mobile Campaign Banner (under 640px) */}
         <div className="block sm:hidden absolute inset-0">
           <img
             src="/images/dfine-hero-mobile.png"
-            alt="Easy by design - D'fine Campaign"
+            alt="The Heavyweight Series - D'fine T-Shirts"
             className="w-full h-full object-cover object-top select-none"
             loading="lazy"
           />
@@ -33,16 +28,16 @@ export function ShoppableHeroSection() {
         <div className="hidden sm:block absolute inset-0">
           <img
             src="/images/dfine-img-010.png"
-            alt="Easy by design - D'fine Campaign"
+            alt="The Heavyweight Series - D'fine T-Shirts"
             className="w-full h-full object-cover object-top select-none"
             loading="lazy"
           />
         </div>
 
-        {/* Subtle vignette gradient on bottom-left for text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+        {/* Contrast gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
 
-        {/* Shoppable Hotspot Pins (Official 40px Ivory Plus Buttons) */}
+        {/* Shoppable Hotspot Pins */}
         <div className="absolute inset-0 z-20 pointer-events-none">
           {shoppableHotspots.map(spot => {
             const isSelected = activeHotspot === spot.id;
@@ -63,7 +58,7 @@ export function ShoppableHeroSection() {
                   <button
                     onClick={() => setActiveHotspot(isSelected ? null : spot.id)}
                     onMouseEnter={() => setActiveHotspot(spot.id)}
-                    className="w-10 h-10 rounded-full bg-[#edebe7] text-[#444] hover:bg-white hover:scale-110 flex items-center justify-center shadow-md transition-all duration-200 focus:outline-none cursor-pointer"
+                    className="w-10 h-10 rounded-full bg-white/95 text-black hover:bg-white hover:scale-110 flex items-center justify-center shadow-md border border-zinc-200 transition-all duration-200 focus:outline-none cursor-pointer"
                     aria-label={`View ${spot.product.title}`}
                   >
                     <svg
@@ -77,14 +72,14 @@ export function ShoppableHeroSection() {
                     </svg>
                   </button>
 
-                  {/* Hotspot Floating Tooltip */}
+                  {/* Hotspot Tooltip */}
                   {isSelected && (
                     <div
                       onMouseLeave={() => setActiveHotspot(null)}
-                      className="absolute left-1/2 -translate-x-1/2 top-12 z-30 bg-white text-[#2a3743] border border-[#e5e5e5] p-3 rounded-[2px] shadow-2xl flex flex-col gap-2 w-[220px] animate-in fade-in zoom-in-95 duration-150"
+                      className="absolute left-1/2 -translate-x-1/2 top-12 z-30 bg-white text-[#0a0a0a] border border-zinc-200 p-3 rounded-[2px] shadow-2xl flex flex-col gap-2 w-[230px] animate-in fade-in zoom-in-95 duration-150"
                     >
                       <div className="flex items-center gap-2.5">
-                        <div className="relative w-10 h-14 bg-[#edebe7] rounded-[2px] overflow-hidden shrink-0">
+                        <div className="relative w-10 h-14 bg-zinc-100 rounded-[2px] overflow-hidden shrink-0 border border-zinc-200">
                           <img
                             src={spot.product.image}
                             alt={spot.product.title}
@@ -93,19 +88,22 @@ export function ShoppableHeroSection() {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[13px] font-medium truncate text-[#2a3743]">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
+                            {spot.product.gsm ? `${spot.product.gsm} GSM • ` : ''}{spot.product.gender}
+                          </span>
+                          <p className="text-[13px] font-medium truncate text-[#0a0a0a]">
                             {spot.product.title}
                           </p>
-                          <p className="text-[12px] font-normal text-neutral-600 mt-0.5">
-                            ${spot.product.price}
+                          <p className="text-[12px] font-semibold text-neutral-900 mt-0.5">
+                            LKR {Number(spot.product.price).toLocaleString()}
                           </p>
                         </div>
                       </div>
 
-                      <div className="pt-1 border-t border-neutral-100 flex items-center justify-between">
+                      <div className="pt-1.5 border-t border-zinc-100 flex items-center justify-between">
                         <button
                           onClick={() => addToCart(spot.product, 1)}
-                          className="text-[11px] font-semibold text-[#2a3743] hover:text-black uppercase tracking-wider flex items-center gap-1"
+                          className="text-[11px] font-semibold text-[#0a0a0a] hover:text-neutral-600 uppercase tracking-wider flex items-center gap-1 cursor-pointer"
                         >
                           <span>Add to bag</span>
                           <ChevronRightIcon className="w-3 h-3" />
@@ -119,24 +117,38 @@ export function ShoppableHeroSection() {
           })}
         </div>
 
-        {/* 
-          Official D'fine Hero Editorial Content:
-          Positioned bottom-left with exactly 40px padding and exact typography
-        */}
-        <div className="absolute bottom-0 left-0 z-20 p-8 sm:p-10 lg:p-12 max-w-[650px] text-white">
-          <h2 className="text-[27px] font-medium leading-[1.1] tracking-normal font-sans drop-shadow-sm normal-case">
-            Easy by design
+        {/* Hero Editorial Content */}
+        <div className="absolute bottom-0 left-0 z-20 p-8 sm:p-10 lg:p-12 max-w-[700px] text-white">
+          <span className="inline-block px-2.5 py-1 mb-3 text-[11px] font-bold uppercase tracking-[0.2em] bg-white/20 backdrop-blur-xs rounded-xs border border-white/30 text-white">
+            2026 T-Shirt Drop
+          </span>
+          <h2 className="text-[32px] sm:text-[40px] font-medium leading-[1.08] tracking-tight font-sans drop-shadow-sm">
+            The Heavyweight Series
           </h2>
-          <p className="text-[15px] font-light leading-relaxed text-white/90 drop-shadow-sm mt-2 mb-5 max-w-[460px]">
-            Soft texture, effortless movement, warm-weather pieces designed to be worn on repeat.
+          <p className="text-[14px] sm:text-[15px] font-light leading-relaxed text-white/90 drop-shadow-sm mt-2 mb-6 max-w-[500px]">
+            240–260 GSM combed cotton. Drop-shoulder silhouettes engineered for structured drape, shape retention, and everyday streetwear.
           </p>
 
-          <Link
-            to="/collections/2026-new"
-            className="inline-flex items-center justify-center px-6 py-2.5 bg-[#edebe7] text-black hover:bg-white transition-colors text-[13px] font-bold tracking-[0.2em] uppercase rounded-full shadow-sm"
-          >
-            Shop Linen
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              to="/collections/men"
+              className="inline-flex items-center justify-center px-5 py-2.5 bg-white text-black hover:bg-zinc-100 transition-colors text-[12px] font-bold tracking-[0.15em] uppercase rounded-full shadow-sm"
+            >
+              Shop Men
+            </Link>
+            <Link
+              to="/collections/women"
+              className="inline-flex items-center justify-center px-5 py-2.5 bg-white text-black hover:bg-zinc-100 transition-colors text-[12px] font-bold tracking-[0.15em] uppercase rounded-full shadow-sm"
+            >
+              Shop Women
+            </Link>
+            <Link
+              to="/collections/unisex"
+              className="inline-flex items-center justify-center px-5 py-2.5 bg-black/40 hover:bg-black/60 border border-white/40 text-white transition-colors text-[12px] font-bold tracking-[0.15em] uppercase rounded-full backdrop-blur-xs shadow-sm"
+            >
+              Shop Unisex
+            </Link>
+          </div>
         </div>
       </div>
     </section>

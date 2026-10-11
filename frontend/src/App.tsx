@@ -16,13 +16,23 @@ import { SearchModal } from './components/modals/SearchModal';
 import HomePage from './pages/HomePage';
 import CollectionPage from './pages/CollectionPage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import LoginPage from './pages/LoginPage';
+import CheckoutPage from './pages/CheckoutPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
+import SearchPage from './pages/SearchPage';
+
+// Module 1 Pages & Providers
+import { AuthProvider } from './modules/module1_user/context/AuthContext';
+import AccountPage from './modules/module1_user/pages/AccountPage';
+import AdminDashboardPage from './modules/module1_user/pages/AdminDashboardPage';
+import InvoicePrintPage from './modules/module1_user/pages/InvoicePrintPage';
 
 function AppShell() {
   const location = useLocation();
   const isHome = location.pathname === '/';
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-white text-[#2a3743] antialiased selection:bg-[#2a3743] selection:text-white">
+    <div className="relative min-h-screen flex flex-col bg-white text-[#0a0a0a] antialiased selection:bg-black selection:text-white">
       <SiteHeader variant={isHome ? 'overlay' : 'solid'} />
 
       <MobileDrawer />
@@ -39,6 +49,14 @@ function AppShell() {
             path="/collections/:collectionHandle/products/:handle"
             element={<ProductDetailPage />}
           />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/order-success/:orderId" element={<OrderSuccessPage />} />
+          <Route path="/account/login" element={<LoginPage />} />
+          <Route path="/account/register" element={<LoginPage initialMode="register" />} />
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/invoices/:invoiceNumber" element={<InvoicePrintPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
@@ -51,9 +69,11 @@ function AppShell() {
 export default function App() {
   return (
     <BrowserRouter>
-      <DfineStoreProvider>
-        <AppShell />
-      </DfineStoreProvider>
+      <AuthProvider>
+        <DfineStoreProvider>
+          <AppShell />
+        </DfineStoreProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

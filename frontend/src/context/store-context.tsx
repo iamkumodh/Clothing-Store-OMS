@@ -24,6 +24,7 @@ interface DfineStoreContextType {
   cartCount: number;
   subtotal: number;
   cartTotal: number;
+  clearCart: () => void;
 }
 
 const DfineStoreContext = createContext<DfineStoreContextType | undefined>(undefined);
@@ -77,6 +78,10 @@ export function DfineStoreProvider({ children }: { children: React.ReactNode }) 
     setQuickViewProduct(null);
   };
 
+  const clearCart = () => {
+    setCart([]);
+  };
+
   return (
     <DfineStoreContext.Provider
       value={{
@@ -94,6 +99,7 @@ export function DfineStoreProvider({ children }: { children: React.ReactNode }) 
         addToCart,
         removeFromCart,
         updateQuantity,
+        clearCart,
         totalItems,
         cartCount: totalItems,
         subtotal,

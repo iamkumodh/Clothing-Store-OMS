@@ -1,8 +1,7 @@
-/**
- * Product Catalog & Collection Filtering Page
- */
+// collection and catalog page
+
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { dfineCollectionProducts } from '../components/common/collection-data';
 import { fetchProducts } from '../api/productApi';
 import { Product } from '../components/common/types';
@@ -13,40 +12,94 @@ interface CollectionPageViewProps {
   title: string;
   subtitle?: string;
   initialProducts?: Product[];
+  defaultGender?: 'ALL' | 'MEN' | 'WOMEN' | 'UNISEX';
+  initialSaleOnly?: boolean;
 }
 
 export function CollectionPageView({
-  title = '2026 - All New',
-  subtitle = 'Curated Capsule',
+  title = 'All T-Shirts',
+  subtitle = 'Curated Drops & Silhouettes',
   initialProducts = dfineCollectionProducts,
+  defaultGender = 'ALL',
+  initialSaleOnly = false,
 }: CollectionPageViewProps) {
   const { openQuickView } = useDfineStore();
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [searchParams] = useSearchParams();
+
+  // URL query param initializers
+  const queryFit = searchParams.get('fit');
+  const queryGsm = searchParams.get('gsm') ? Number(searchParams.get('gsm')) : null;
+  const queryCategory = searchParams.get('category');
+
+  const [selectedGender, setSelectedGender] = useState<'ALL' | 'MEN' | 'WOMEN' | 'UNISEX'>(defaultGender);
+  const [selectedFit, setSelectedFit] = useState<string>(queryFit || 'All');
+  const [selectedGsm, setSelectedGsm] = useState<number | 'All'>(queryGsm || 'All');
+  const [selectedCategory, setSelectedCategory] = useState<string>(queryCategory || 'All');
   const [selectedSort, setSelectedSort] = useState<string>('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [onlySale, setOnlySale] = useState(false);
+  const [onlySale, setOnlySale] = useState(initialSaleOnly);
 
-  const categories = ['All', 'Tops', 'Bottoms', 'Dresses', 'Layers', 'Sets'];
-  const availableSizes = ['XS', 'S', 'M', 'L', 'XL'];
+  // Sync when defaultGender changes (e.g. route switch)
+  useEffect(() => {
+    setSelectedGender(defaultGender);
+    setOnlySale(initialSaleOnly);
+  }, [defaultGender, initialSaleOnly]);
+
+  const categories = [
+    'All',
+    'Heavyweight Essentials',
+    'Graphic Tees',
+    'Vintage Washed',
+    'Everyday Basics',
+  ];
+
+  const fits = ['All', 'Oversized', 'Relaxed', 'Classic', 'Boxy Cropped'];
+  const gsmOptions = ['All', 180, 220, 240, 260];
+  const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
   const filteredProducts = useMemo(() => {
     let result = [...initialProducts];
 
-    if (selectedCategory !== 'All') {
-      result = result.filter(p => p.category.toLowerCase() === selectedCategory.toLowerCase());
-    }
-
-    if (onlySale) {
+    // Gender filter
+    if (selectedGender !== 'ALL') {
       result = result.filter(
-        p => p.badge === 'Sale' || (p.compareAtPrice && p.compareAtPrice > p.price)
+        p => p.gender === selectedGender || (selectedGender !== 'UNISEX' && p.gender === 'UNISEX')
       );
     }
 
+    // Category / Style filter
+    if (selectedCategory !== 'All') {
+      result = result.filter(
+        p => p.category?.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+
+    // Fit filter
+    if (selectedFit !== 'All') {
+      result = result.filter(
+        p => p.fit?.toLowerCase() === selectedFit.toLowerCase()
+      );
+    }
+
+    // GSM filter
+    if (selectedGsm !== 'All') {
+      result = result.filter(p => p.gsm === selectedGsm);
+    }
+
+    // Sale filter
+    if (onlySale) {
+      result = result.filter(
+        p => p.badge?.toLowerCase().includes('sale') || (p.compareAtPrice && p.compareAtPrice > p.price)
+      );
+    }
+
+    // Sizes filter
     if (selectedSizes.length > 0) {
       result = result.filter(p => (p.sizes ? selectedSizes.some(s => p.sizes?.includes(s)) : true));
     }
 
+    // Sort order
     if (selectedSort === 'price-asc') {
       result.sort((a, b) => a.price - b.price);
     } else if (selectedSort === 'price-desc') {
@@ -58,7 +111,16 @@ export function CollectionPageView({
     }
 
     return result;
-  }, [initialProducts, selectedCategory, selectedSort, selectedSizes, onlySale]);
+  }, [
+    initialProducts,
+    selectedGender,
+    selectedCategory,
+    selectedFit,
+    selectedGsm,
+    selectedSort,
+    selectedSizes,
+    onlySale,
+  ]);
 
   const toggleSize = (size: string) => {
     setSelectedSizes(prev =>
@@ -67,6 +129,9 @@ export function CollectionPageView({
   };
 
   const clearAllFilters = () => {
+    setSelectedGender('ALL');
+    setSelectedFit('All');
+    setSelectedGsm('All');
     setSelectedCategory('All');
     setSelectedSizes([]);
     setOnlySale(false);
@@ -76,57 +141,65 @@ export function CollectionPageView({
   return (
     <div className="w-full">
       {/* Promo Banner */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <div className="bg-[#edebe7] p-8 md:p-12 text-center rounded-none">
-          <span className="text-[11px] uppercase tracking-[0.2em] font-semibold text-[#6e7278] block mb-2">
-            Limited Time Offer
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <div className="bg-neutral-50 border border-zinc-200 p-8 md:p-10 text-center rounded-sm">
+          <span className="text-[11px] uppercase tracking-[0.2em] font-bold text-neutral-500 block mb-2">
+            The Heavyweight Standard
           </span>
-          <h2 className="font-serif text-2xl md:text-4xl font-normal text-[#2a3743] mb-3">
-            Save on Select Styles
+          <h2 className="font-sans text-2xl md:text-3xl font-semibold text-[#0a0a0a] mb-2">
+            Engineered Combed Cotton T-Shirts
           </h2>
-          <p className="text-xs md:text-sm text-[#4a5568] max-w-lg mx-auto mb-6">
-            Take an extra 10% off sale items — limited time only on our 2026 new arrivals
-            collection.
+          <p className="text-xs md:text-sm text-neutral-600 max-w-xl mx-auto mb-5 leading-relaxed">
+            Crafted in 180, 220, and 260 GSM textile weights with reinforced anti-sag collars and drop-shoulder streetwear silhouettes.
           </p>
-          <button
-            onClick={() => setOnlySale(true)}
-            className="inline-block bg-[#2a3743] hover:bg-black text-white text-[11px] font-semibold tracking-[0.2em] uppercase px-8 py-3.5 transition-colors"
-          >
-            SHOP SALE
-          </button>
+          <div className="flex items-center justify-center gap-3">
+            <a
+              href="/#gsm-guide"
+              className="inline-block bg-black hover:bg-neutral-800 text-white text-[11px] font-bold tracking-[0.15em] uppercase px-6 py-2.5 transition-colors cursor-pointer rounded-xs"
+            >
+              GSM Weight Guide
+            </a>
+            <button
+              onClick={() => setOnlySale(true)}
+              className="inline-block bg-white hover:bg-neutral-100 border border-zinc-300 text-black text-[11px] font-bold tracking-[0.15em] uppercase px-6 py-2.5 transition-colors cursor-pointer rounded-xs"
+            >
+              Sale Items Only
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Collection Title & Breadcrumb Header */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-4">
-        <nav className="text-[11px] tracking-wide text-[#6e7278] mb-3 uppercase">
-          <Link to="/" className="hover:text-[#2a3743] transition-colors">
+      {/* Collection Header & Breadcrumb */}
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-4">
+        <nav className="text-[11px] tracking-wide text-neutral-500 mb-3 uppercase">
+          <Link to="/" className="hover:text-black transition-colors">
             Home
           </Link>
           <span className="mx-2">/</span>
-          <span className="text-[#2a3743] font-medium">{title}</span>
+          <span className="text-[#0a0a0a] font-medium">{title}</span>
         </nav>
-        <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-[#e5e5e5] pb-6 gap-4">
+
+        <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-zinc-200 pb-6 gap-4">
           <div>
-            <h1 className="font-serif text-3xl md:text-4xl font-normal text-[#2a3743]">{title}</h1>
+            <h1 className="text-3xl md:text-4xl font-semibold text-[#0a0a0a]">{title}</h1>
             {subtitle && (
-              <p className="text-xs text-[#6e7278] tracking-widest uppercase mt-1">{subtitle}</p>
+              <p className="text-xs text-neutral-500 tracking-wider uppercase mt-1">{subtitle}</p>
             )}
           </div>
 
-          {/* Category Tabs */}
+          {/* Gender Filter Pills */}
           <div className="flex flex-wrap gap-2 pt-2 md:pt-0">
-            {categories.map(cat => (
+            {(['ALL', 'MEN', 'WOMEN', 'UNISEX'] as const).map(gender => (
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`text-[12px] uppercase tracking-[0.1em] px-3.5 py-1.5 transition-colors ${
-                  selectedCategory === cat
-                    ? 'bg-[#2a3743] text-white font-medium'
-                    : 'bg-[#f5f5f5] text-[#2a3743] hover:bg-[#e8e8e8]'
+                key={gender}
+                onClick={() => setSelectedGender(gender)}
+                className={`text-[12px] uppercase tracking-[0.1em] px-4 py-2 rounded-xs transition-colors cursor-pointer font-bold ${
+                  selectedGender === gender
+                    ? 'bg-black text-white shadow-xs'
+                    : 'bg-neutral-100 text-[#0a0a0a] hover:bg-neutral-200'
                 }`}
               >
-                {cat}
+                {gender === 'ALL' ? 'All Lines' : gender === 'MEN' ? "Men's" : gender === 'WOMEN' ? "Women's" : 'Unisex'}
               </button>
             ))}
           </div>
@@ -137,23 +210,27 @@ export function CollectionPageView({
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center gap-2 px-3 py-2 border border-[#d6d6d6] hover:border-[#2a3743] text-[#2a3743] uppercase tracking-[0.1em] text-[11px] font-medium transition-colors"
+              className="flex items-center gap-2 px-3 py-2 border border-zinc-300 hover:border-black text-[#0a0a0a] uppercase tracking-[0.1em] text-[11px] font-bold transition-colors cursor-pointer"
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span>Filter</span>
-              {(selectedSizes.length > 0 || onlySale || selectedCategory !== 'All') && (
-                <span className="w-2 h-2 rounded-full bg-[#2a3743]"></span>
+              <span>Filter Facets</span>
+              {(selectedSizes.length > 0 ||
+                onlySale ||
+                selectedFit !== 'All' ||
+                selectedGsm !== 'All' ||
+                selectedCategory !== 'All') && (
+                <span className="w-2 h-2 rounded-full bg-black"></span>
               )}
             </button>
-            <span className="text-[#6e7278] hidden sm:inline-block">
-              {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+            <span className="text-neutral-500 hidden sm:inline-block">
+              {filteredProducts.length} {filteredProducts.length === 1 ? 't-shirt' : 't-shirts'} found
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             <label
               htmlFor="SortBy"
-              className="text-[11px] uppercase tracking-wider text-[#6e7278] hidden sm:inline-block"
+              className="text-[11px] uppercase tracking-wider text-neutral-500 hidden sm:inline-block"
             >
               Sort:
             </label>
@@ -161,35 +238,100 @@ export function CollectionPageView({
               id="SortBy"
               value={selectedSort}
               onChange={e => setSelectedSort(e.target.value)}
-              className="bg-white border border-[#d6d6d6] text-[#2a3743] text-[11px] uppercase tracking-wider px-3 py-2 outline-none focus:border-[#2a3743] cursor-pointer"
+              className="bg-white border border-zinc-300 text-[#0a0a0a] text-[11px] uppercase tracking-wider px-3 py-2 outline-none focus:border-black cursor-pointer"
             >
-              <option value="featured">Featured</option>
-              <option value="price-asc">Price, low to high</option>
-              <option value="price-desc">Price, high to low</option>
-              <option value="title-asc">Alphabetically, A-Z</option>
-              <option value="title-desc">Alphabetically, Z-A</option>
+              <option value="featured">Featured Drops</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="title-asc">Alphabetically: A-Z</option>
+              <option value="title-desc">Alphabetically: Z-A</option>
             </select>
           </div>
         </div>
 
-        {/* Filter Drawer / Accordion Section */}
+        {/* Filter Drawer / Facet Panels */}
         {isFilterOpen && (
-          <div className="p-5 mb-6 bg-[#fafafa] border border-[#e5e5e5] grid grid-cols-1 sm:grid-cols-3 gap-6 transition-all duration-300">
+          <div className="p-6 mb-6 bg-neutral-50 border border-zinc-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-all duration-300">
+            {/* 1. Fit Filter */}
             <div>
-              <h4 className="text-[11px] uppercase tracking-[0.15em] font-semibold text-[#2a3743] mb-3">
-                Size
+              <h4 className="text-[11px] uppercase tracking-[0.15em] font-bold text-[#0a0a0a] mb-2.5">
+                Fit / Silhouette
               </h4>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
+                {fits.map(fit => (
+                  <button
+                    key={fit}
+                    onClick={() => setSelectedFit(fit)}
+                    className={`text-[11px] uppercase px-2.5 py-1 border transition-colors cursor-pointer ${
+                      selectedFit === fit
+                        ? 'border-black bg-black text-white font-medium'
+                        : 'border-zinc-300 bg-white text-neutral-700 hover:border-black'
+                    }`}
+                  >
+                    {fit}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 2. GSM Fabric Weight Filter */}
+            <div>
+              <h4 className="text-[11px] uppercase tracking-[0.15em] font-bold text-[#0a0a0a] mb-2.5">
+                Fabric Weight (GSM)
+              </h4>
+              <div className="flex flex-wrap gap-1.5">
+                {gsmOptions.map(gsm => (
+                  <button
+                    key={String(gsm)}
+                    onClick={() => setSelectedGsm(gsm as any)}
+                    className={`text-[11px] uppercase px-2.5 py-1 border transition-colors cursor-pointer ${
+                      selectedGsm === gsm
+                        ? 'border-black bg-black text-white font-medium'
+                        : 'border-zinc-300 bg-white text-neutral-700 hover:border-black'
+                    }`}
+                  >
+                    {gsm === 'All' ? 'All GSM' : `${gsm} GSM`}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 3. Style Category */}
+            <div>
+              <h4 className="text-[11px] uppercase tracking-[0.15em] font-bold text-[#0a0a0a] mb-2.5">
+                Style Category
+              </h4>
+              <div className="flex flex-col gap-1 text-[12px]">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`text-left transition-colors cursor-pointer ${
+                      selectedCategory === cat ? 'font-bold text-black underline' : 'text-neutral-600 hover:text-black'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 4. Sizing & Reset */}
+            <div>
+              <h4 className="text-[11px] uppercase tracking-[0.15em] font-bold text-[#0a0a0a] mb-2.5">
+                Sizes & Promo
+              </h4>
+              <div className="flex flex-wrap gap-1.5 mb-3">
                 {availableSizes.map(size => {
                   const isChecked = selectedSizes.includes(size);
                   return (
                     <button
                       key={size}
                       onClick={() => toggleSize(size)}
-                      className={`w-9 h-9 text-xs flex items-center justify-center border transition-colors ${
+                      className={`w-8 h-8 text-[11px] flex items-center justify-center border transition-colors cursor-pointer ${
                         isChecked
-                          ? 'border-[#2a3743] bg-[#2a3743] text-white'
-                          : 'border-[#d6d6d6] bg-white text-[#2a3743] hover:border-black'
+                          ? 'border-black bg-black text-white font-bold'
+                          : 'border-zinc-300 bg-white text-[#0a0a0a] hover:border-black'
                       }`}
                     >
                       {size}
@@ -197,32 +339,22 @@ export function CollectionPageView({
                   );
                 })}
               </div>
-            </div>
 
-            <div>
-              <h4 className="text-[11px] uppercase tracking-[0.15em] font-semibold text-[#2a3743] mb-3">
-                Promotions
-              </h4>
-              <label className="flex items-center gap-2 cursor-pointer text-xs text-[#2a3743]">
+              <label className="flex items-center gap-2 cursor-pointer text-xs text-[#0a0a0a] mb-3">
                 <input
                   type="checkbox"
                   checked={onlySale}
                   onChange={e => setOnlySale(e.target.checked)}
-                  className="rounded-none border-[#ccc] text-[#2a3743] focus:ring-0"
+                  className="rounded-none border-zinc-300 text-black focus:ring-0"
                 />
-                <span>Sale Items Only</span>
+                <span>Sale Clearance Only</span>
               </label>
-            </div>
 
-            <div className="flex flex-col justify-between items-start sm:items-end">
-              <span className="text-xs text-[#6e7278]">
-                Showing {filteredProducts.length} of {initialProducts.length} styles
-              </span>
               <button
                 onClick={clearAllFilters}
-                className="text-[11px] uppercase tracking-wider text-[#2a3743] hover:underline mt-4 sm:mt-0 font-medium"
+                className="text-[11px] uppercase tracking-wider text-rose-600 hover:underline font-bold cursor-pointer"
               >
-                Clear all filters
+                Reset All Filters
               </button>
             </div>
           </div>
@@ -230,13 +362,14 @@ export function CollectionPageView({
       </div>
 
       {/* Product Grid: 4-columns */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         {filteredProducts.length === 0 ? (
-          <div className="py-20 text-center text-[#6e7278]">
-            <p className="text-sm">No products found matching your filters.</p>
+          <div className="py-20 text-center text-neutral-500">
+            <p className="text-base font-medium text-neutral-800">No t-shirts found matching your filters.</p>
+            <p className="text-xs text-neutral-500 mt-1">Try resetting your GSM, Fit, or Gender criteria.</p>
             <button
               onClick={clearAllFilters}
-              className="mt-4 text-xs uppercase tracking-wider text-[#2a3743] underline font-medium"
+              className="mt-4 text-xs uppercase tracking-wider text-[#0a0a0a] underline font-bold cursor-pointer"
             >
               Reset filters
             </button>
@@ -250,13 +383,13 @@ export function CollectionPageView({
               return (
                 <div key={product.id} className="group relative flex flex-col">
                   {/* Image Container */}
-                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#f4f2ee]">
+                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-neutral-100 border border-zinc-100">
                     {product.badge && (
                       <span
-                        className={`absolute top-0 right-0 z-10 text-[13px] font-normal tracking-[0.4px] px-2.5 py-1 ${
-                          product.badge === 'Sale'
-                            ? 'bg-[#fddaca] text-[#2a3743]'
-                            : 'bg-[#edebe7] text-[#2a3743]'
+                        className={`absolute top-0 right-0 z-10 text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 ${
+                          product.badge.toLowerCase().includes('sale')
+                            ? 'bg-black text-white'
+                            : 'bg-white/95 text-black border-b border-l border-zinc-200 backdrop-blur-xs'
                         }`}
                       >
                         {product.badge}
@@ -264,7 +397,7 @@ export function CollectionPageView({
                     )}
 
                     <Link
-                      to={`/collections/2026-new/products/${product.handle}`}
+                      to={`/products/${product.handle}`}
                       className="block w-full h-full relative"
                     >
                       <img
@@ -273,7 +406,7 @@ export function CollectionPageView({
                         className={`w-full h-full object-cover transition-opacity duration-500 ${
                           hasHover
                             ? 'group-hover:opacity-0'
-                            : 'group-hover:scale-105 transition-transform duration-700'
+                            : 'group-hover:opacity-90'
                         }`}
                         loading="lazy"
                       />
@@ -287,7 +420,7 @@ export function CollectionPageView({
                       )}
                     </Link>
 
-                    {/* Quick View Button (Exact 1:1 D'fine Theme) */}
+                    {/* Quick View Button */}
                     <button
                       type="button"
                       onClick={e => {
@@ -295,7 +428,7 @@ export function CollectionPageView({
                         e.stopPropagation();
                         openQuickView(product);
                       }}
-                      className="absolute bottom-[10px] left-[10px] right-[10px] w-[calc(100%-20px)] z-20 bg-[#2a3743] hover:bg-black text-white text-[14px] font-normal tracking-[0.35px] py-2 px-1 text-center opacity-0 translate-y-[5px] group-hover:opacity-100 group-hover:translate-y-0 transition-[opacity,transform,background-color] duration-250 ease-out cursor-pointer rounded-none"
+                      className="absolute bottom-[10px] left-[10px] right-[10px] w-[calc(100%-20px)] z-20 bg-black hover:bg-neutral-800 text-white text-[12px] font-bold tracking-[0.35px] py-2 px-1 text-center opacity-0 translate-y-[5px] group-hover:opacity-100 group-hover:translate-y-0 transition-[opacity,transform,background-color] duration-200 ease-out cursor-pointer"
                     >
                       Quick View
                     </button>
@@ -303,9 +436,17 @@ export function CollectionPageView({
 
                   {/* Product Info */}
                   <div className="pt-3 pb-1 flex flex-col flex-1">
+                    {(product.gsm || product.gender) && (
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-0.5">
+                        {product.gsm ? `${product.gsm} GSM` : ''}
+                        {product.gsm && product.gender ? ' • ' : ''}
+                        {product.gender || ''}
+                      </div>
+                    )}
+
                     <Link
-                      to={`/collections/2026-new/products/${product.handle}`}
-                      className="text-sm text-[#2a3743] hover:text-[#000] font-normal transition-colors line-clamp-1"
+                      to={`/products/${product.handle}`}
+                      className="text-sm text-[#0a0a0a] hover:underline font-medium transition-colors line-clamp-1"
                     >
                       {product.title}
                     </Link>
@@ -313,16 +454,17 @@ export function CollectionPageView({
                     <div className="mt-1 flex items-center gap-2 text-xs">
                       {hasDiscount ? (
                         <>
-                          <span className="text-[#a83232] font-medium">${product.price}</span>
-                          <span className="text-[#888] line-through">
-                            ${product.compareAtPrice}
+                          <span className="text-black font-semibold font-mono">
+                            LKR {Number(product.price).toLocaleString()}
                           </span>
-                          <span className="text-[10px] text-[#a83232] uppercase font-semibold">
-                            Save ${(product.compareAtPrice! - product.price).toFixed(0)}
+                          <span className="text-neutral-400 line-through font-mono">
+                            LKR {Number(product.compareAtPrice).toLocaleString()}
                           </span>
                         </>
                       ) : (
-                        <span className="text-[#4a5568]">${product.price}</span>
+                        <span className="text-neutral-900 font-semibold font-mono">
+                          LKR {Number(product.price).toLocaleString()}
+                        </span>
                       )}
                     </div>
 
@@ -361,12 +503,41 @@ export default function CollectionPage() {
     });
   }, [handle]);
 
-  const title = handle
-    ? handle
-        .split('-')
-        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(' ')
-    : '2026 - All New';
+  let defaultGender: 'ALL' | 'MEN' | 'WOMEN' | 'UNISEX' = 'ALL';
+  let initialSaleOnly = false;
+  let title = 'All T-Shirts';
+  let subtitle = 'Everyday Essentials & Heavyweight Streetwear';
 
-  return <CollectionPageView title={title} initialProducts={products} />;
+  if (handle === 'men') {
+    defaultGender = 'MEN';
+    title = "Men's T-Shirts";
+    subtitle = 'Heavyweight Drops, Relaxed Fits & Classic Crews';
+  } else if (handle === 'women') {
+    defaultGender = 'WOMEN';
+    title = "Women's T-Shirts";
+    subtitle = 'Boxy Cropped Cuts, Baby Tees & Boyfriend Silhouettes';
+  } else if (handle === 'unisex') {
+    defaultGender = 'UNISEX';
+    title = 'Unisex & Streetwear';
+    subtitle = 'Heavyweight 260 GSM Blanks & Graphic Series';
+  } else if (handle === 'sale') {
+    initialSaleOnly = true;
+    title = 'Sale Clearance';
+    subtitle = 'Discounted T-Shirt Drops';
+  } else if (handle) {
+    title = handle
+      .split('-')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+  }
+
+  return (
+    <CollectionPageView
+      title={title}
+      subtitle={subtitle}
+      initialProducts={products}
+      defaultGender={defaultGender}
+      initialSaleOnly={initialSaleOnly}
+    />
+  );
 }

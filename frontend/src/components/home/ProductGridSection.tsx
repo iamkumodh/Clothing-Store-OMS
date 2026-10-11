@@ -20,22 +20,22 @@ export function ProductGridSection({
   const { setQuickViewProduct } = useDfineStore();
 
   return (
-    <section id={id} className="py-16 bg-white border-t border-[#f0f0ed]">
+    <section id={id} className="py-16 bg-white border-t border-zinc-200">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-8">
-        <div className="flex items-end justify-between mb-8 pb-3 border-b border-[#e8e6e3]">
+        <div className="flex items-end justify-between mb-8 pb-3 border-b border-zinc-200">
           <div>
             {subtitle && (
-              <span className="text-[11px] uppercase tracking-widest text-[#526b81] font-bold block mb-1">
+              <span className="text-[11px] uppercase tracking-widest text-zinc-500 font-bold block mb-1">
                 {subtitle}
               </span>
             )}
-            <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-[#2a3743]">
+            <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-[#0a0a0a]">
               {title}
             </h2>
           </div>
           <Link
             to="/collections/2026-new"
-            className="text-[13px] font-medium text-[#2a3743] hover:underline underline-offset-4"
+            className="text-[13px] font-medium text-[#0a0a0a] hover:underline underline-offset-4"
           >
             View all
           </Link>
@@ -64,21 +64,21 @@ function ProductCard({ product, onQuickView }: { product: Product; onQuickView: 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative aspect-[3/4] w-full bg-[#f2f0ec] rounded-[2px] overflow-hidden">
+      <div className="relative aspect-[3/4] w-full bg-zinc-100 rounded-[2px] overflow-hidden border border-zinc-100">
         <img
           src={isHovered && product.hoverImage ? product.hoverImage : product.image}
           alt={product.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-95"
           loading="lazy"
         />
 
         {/* Badge */}
         {product.badge && (
           <span
-            className={`absolute top-0 right-0 z-10 text-[13px] font-normal tracking-[0.4px] px-2.5 py-1 ${
+            className={`absolute top-0 right-0 z-10 text-[11px] uppercase font-semibold tracking-wider px-2.5 py-1 ${
               product.badge === 'Sale'
-                ? 'bg-[#fddaca] text-[#2a3743]'
-                : 'bg-[#edebe7] text-[#2a3743]'
+                ? 'bg-black text-white'
+                : 'bg-white text-black border-b border-l border-zinc-200'
             }`}
           >
             {product.badge}
@@ -93,7 +93,7 @@ function ProductCard({ product, onQuickView }: { product: Product; onQuickView: 
             e.stopPropagation();
             onQuickView();
           }}
-          className="absolute bottom-[10px] left-[10px] right-[10px] w-[calc(100%-20px)] z-20 bg-[#2a3743] hover:bg-black text-white text-[14px] font-normal tracking-[0.35px] py-2 px-1 text-center opacity-0 translate-y-[5px] group-hover:opacity-100 group-hover:translate-y-0 transition-[opacity,transform,background-color] duration-250 ease-out cursor-pointer rounded-none"
+          className="absolute bottom-[10px] left-[10px] right-[10px] w-[calc(100%-20px)] z-20 bg-black hover:bg-zinc-800 text-white text-[13px] font-medium tracking-[0.35px] py-2 px-1 text-center opacity-0 translate-y-[5px] group-hover:opacity-100 group-hover:translate-y-0 transition-[opacity,transform,background-color] duration-250 ease-out cursor-pointer rounded-none"
         >
           Quick View
         </button>
@@ -101,8 +101,15 @@ function ProductCard({ product, onQuickView }: { product: Product; onQuickView: 
 
       <div className="pt-3 pb-1 flex-1 flex flex-col justify-between">
         <div>
+          {(product.gsm || product.gender) && (
+            <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-0.5">
+              {product.gsm ? `${product.gsm} GSM` : ''}
+              {product.gsm && product.gender ? ' • ' : ''}
+              {product.gender || ''}
+            </div>
+          )}
           <Link to={`/products/${product.handle}`} className="block">
-            <h3 className="text-[14px] font-medium text-[#2a3743] hover:underline underline-offset-4 line-clamp-1">
+            <h3 className="text-[14px] font-medium text-[#0a0a0a] hover:underline underline-offset-4 line-clamp-1">
               {product.title}
             </h3>
           </Link>
@@ -110,12 +117,12 @@ function ProductCard({ product, onQuickView }: { product: Product; onQuickView: 
 
         <div className="mt-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-[13px] font-semibold text-[#2a3743] font-mono">
-              ${product.price}
+            <span className="text-[13px] font-semibold text-[#0a0a0a] font-mono">
+              LKR {Number(product.price).toLocaleString()}
             </span>
             {product.compareAtPrice && (
-              <span className="text-[12px] text-[#999999] line-through font-mono">
-                ${product.compareAtPrice}
+              <span className="text-[12px] text-zinc-500 line-through font-mono">
+                LKR {Number(product.compareAtPrice).toLocaleString()}
               </span>
             )}
           </div>
