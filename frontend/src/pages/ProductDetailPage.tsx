@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Star, Minus, Plus, ChevronDown, X, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Star, Minus, Plus, ChevronDown, X, CheckCircle2 } from 'lucide-react';
 import { Product } from '../components/common/types';
 import { dfineProducts } from '../components/common/data';
 import { dfineCollectionProducts } from '../components/common/collection-data';

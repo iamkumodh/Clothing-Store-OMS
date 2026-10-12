@@ -1,9 +1,11 @@
 // order confirmation page
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { fetchOrderById, CustomerOrderResponse } from '../api/orderApi';
 import { submitBankTransfer, verifyBankTransfer, BankTransferResponse } from '../api/paymentApi';
+import { useAuth } from '../modules/module1_user/context/AuthContext';
+import { mockDb } from '../api/mockDataStore';
 import { LiveTrackingModal } from '../modules/module4_payment/components/LiveTrackingModal';
 import {
   CheckCircle,
@@ -11,10 +13,7 @@ import {
   UploadCloud,
   FileCheck,
   ShieldAlert,
-  ArrowRight,
   Printer,
-  ShoppingBag,
-  ExternalLink,
   Building,
   CheckCircle2,
   AlertCircle,
@@ -103,23 +102,89 @@ export default function OrderSuccessPage() {
     }
   };
 
+  const { user, staffProfile } = useAuth();
+
+  const isStaff = useMemo(() => {
+    if (!user) return false;
+    return user.role === 'STORE_STAFF' || user.role === 'MANAGER' || user.role === 'ADMIN';
+  }, [user]);
+
+  const currentStaff = useMemo(() => {
+    if (staffProfile) return staffProfile;
+    if (user) {
+      const s = mockDb.getStaffByUserId(user.userId);
+      if (s) {
+        return {
+          staffId: s.staffId,
+          userId: s.userId,
+          email: user.email,
+          firstName: s.firstName,
+          lastName: s.lastName,
+          designation: s.designation,
+          clearanceLevel: s.clearanceLevel,
+        };
+      }
+    }
+    return null;
+  }, [user, staffProfile]);
+
+  const currentStaffId = currentStaff?.staffId || 1;
+
+  const isSelfOrder = useMemo(() => {
+    if (!order || !user) return false;
+    const currentUserId = user.userId;
+    const currentUserEmail = user.email?.toLowerCase();
+
+    // 1. Order customer email matches current user email
+    const orderEmail = (order as any).customerEmail?.toLowerCase();
+    if (currentUserEmail && orderEmail && orderEmail === currentUserEmail) {
+      return true;
+    }
+
+    // 2. Order customerId matches
+    const customer = mockDb.getCustomerById(order.customerId);
+    if (currentUserId && customer && customer.userId === currentUserId) {
+      return true;
+    }
+
+    // 3. Customer email matches user email
+    if (currentUserEmail && customer && customer.email.toLowerCase() === currentUserEmail) {
+      return true;
+    }
+
+    // 4. Staff member assisted this order
+    if (currentStaff && (order as any).assistedByStaffId === currentStaff.staffId) {
+      return true;
+    }
+
+    return false;
+  }, [order, user, currentStaff]);
+
   const handleVerifyPayment = async () => {
     if (!order) return;
+    if (!isStaff) {
+      setActionNotice('Unauthorized: Payment slip verification requires store staff credentials.');
+      return;
+    }
+    if (isSelfOrder) {
+      setActionNotice('Segregation of Duties Violation: You cannot approve payment for your own order.');
+      return;
+    }
     setIsVerifying(true);
     setActionNotice(null);
 
     const targetTransferId = transfer?.transferId || order.orderId;
 
     try {
-      const res = await verifyBankTransfer(targetTransferId, 1);
+      const res = await verifyBankTransfer(targetTransferId, currentStaffId);
       setTransfer(res);
 
       // Advance Order Status from PENDING to PROCESSING (Member 3 & 4 Integration)
       setOrder(prev => (prev ? { ...prev, orderStatus: 'PROCESSING' } : prev));
       setActionNotice('Verified! Payment confirmed by Store Staff. Order status updated to PROCESSING.');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Verification error', err);
-      setActionNotice('Verification failed.');
+      setActionNotice(err.message || 'Verification failed.');
     } finally {
       setIsVerifying(false);
     }
@@ -389,50 +454,95 @@ export default function OrderSuccessPage() {
                     </button>
                   </form>
 
-                  {/* Store Operations / Payment Clearance Panel */}
-                  <div className="mt-6 pt-5 border-t border-zinc-200">
-                    <div className="bg-zinc-50 border border-zinc-200 rounded-[2px] p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-[#0a0a0a] font-bold text-xs uppercase tracking-wider">
-                          <FileCheck className="w-4 h-4 text-black" />
-                          <span>Store Operations • Payment Clearance</span>
+                  {/* Store Operations / Payment Clearance Panel (Restricted to Staff/Admin) */}
+                  {isStaff ? (
+                    <div className="mt-6 pt-5 border-t border-zinc-200">
+                      <div className="bg-zinc-50 border border-zinc-200 rounded-[2px] p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-[#0a0a0a] font-bold text-xs uppercase tracking-wider">
+                            <FileCheck className="w-4 h-4 text-black" />
+                            <span>Store Operations • Payment Clearance</span>
+                          </div>
+                          <span
+                            className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-[2px] ${
+                              isVerified ? 'bg-black text-white' : 'bg-zinc-200 text-zinc-800'
+                            }`}
+                          >
+                            {isVerified ? 'Payment Cleared' : 'Pending Audit'}
+                          </span>
                         </div>
-                        <span
-                          className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-[2px] ${
-                            isVerified ? 'bg-black text-white' : 'bg-zinc-200 text-zinc-800'
-                          }`}
-                        >
-                          {isVerified ? 'Payment Cleared' : 'Pending Audit'}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-zinc-500 leading-relaxed">
-                        {isVerified
-                          ? 'Customer bank deposit receipt has been validated against store accounts. Order is approved and queued for warehouse packaging.'
-                          : 'Customer bank deposit receipt has been received. Authorized staff may verify transaction credentials to authorize and release order fulfillment.'}
-                      </p>
-                      <button
-                        onClick={handleVerifyPayment}
-                        disabled={isVerifying || isVerified}
-                        className={`w-full py-2.5 text-xs font-semibold uppercase tracking-wider rounded-[2px] transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                          isVerified
-                            ? 'bg-zinc-800 text-white cursor-default'
-                            : 'bg-black hover:bg-zinc-800 text-white shadow-xs'
-                        }`}
-                      >
-                        {isVerifying ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        ) : isVerified ? (
-                          <>
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Payment Cleared • Processing Order
-                          </>
-                        ) : (
-                          <>
-                            <FileCheck className="w-3.5 h-3.5" /> Authorize & Clear Payment
-                          </>
+
+                        {/* SoD Alert if staff member placed this order */}
+                        {isSelfOrder && (
+                          <div className="bg-amber-50 border border-amber-300 p-3 rounded-[2px] text-amber-900 flex items-start gap-2.5 text-xs">
+                            <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                            <div>
+                              <strong className="font-semibold block text-[11px] uppercase tracking-wider text-amber-800">
+                                Segregation of Duties (SoD) Enforced
+                              </strong>
+                              <p className="text-[11px] text-amber-700 mt-0.5">
+                                You are the customer for this order. Dual-custody financial governance prohibits self-approval.
+                                Another authorized staff member must verify this deposit slip from the Payment Management console.
+                              </p>
+                            </div>
+                          </div>
                         )}
-                      </button>
+
+                        <p className="text-[11px] text-zinc-500 leading-relaxed">
+                          {isVerified
+                            ? 'Customer bank deposit receipt has been validated against store accounts. Order is approved and queued for warehouse packaging.'
+                            : isSelfOrder
+                            ? 'Deposit slip uploaded. Please request a peer staff officer or manager to verify this transaction.'
+                            : 'Authorized store staff may verify transaction credentials to authorize and release order fulfillment.'}
+                        </p>
+                        <button
+                          onClick={handleVerifyPayment}
+                          disabled={isVerifying || isVerified || isSelfOrder}
+                          className={`w-full py-2.5 text-xs font-semibold uppercase tracking-wider rounded-[2px] transition-all flex items-center justify-center gap-2 ${
+                            isSelfOrder
+                              ? 'bg-zinc-200 text-zinc-400 cursor-not-allowed border border-zinc-300'
+                              : isVerified
+                              ? 'bg-zinc-800 text-white cursor-default'
+                              : 'bg-black hover:bg-zinc-800 text-white shadow-xs cursor-pointer'
+                          }`}
+                          title={isSelfOrder ? 'Segregation of duties: You cannot authorize your own order' : undefined}
+                        >
+                          {isVerifying ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : isVerified ? (
+                            <>
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Payment Cleared • Processing Order
+                            </>
+                          ) : isSelfOrder ? (
+                            <>
+                              <ShieldAlert className="w-3.5 h-3.5" /> Self-Verification Locked (SoD)
+                            </>
+                          ) : (
+                            <>
+                              <FileCheck className="w-3.5 h-3.5" /> Authorize &amp; Clear Payment
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    /* Customer Awaiting Audit Notice */
+                    <div className="mt-6 pt-5 border-t border-zinc-200">
+                      <div className="bg-zinc-50 border border-zinc-200 rounded-[2px] p-4 flex items-start gap-3">
+                        <Clock className="w-4 h-4 text-zinc-500 shrink-0 mt-0.5" />
+                        <div className="text-xs">
+                          <span className="font-semibold text-zinc-900 block">
+                            {isVerified ? 'Payment Verified & Approved' : 'Slip Verification in Progress'}
+                          </span>
+                          <p className="text-[11px] text-zinc-500 mt-0.5 leading-relaxed">
+                            {isVerified
+                              ? 'Your payment has been verified by our store team. Your order is now being processed for dispatch.'
+                              : 'Our accounts team will verify your deposited payment slip against our bank statements and notify you via SMS/Email once released.'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </>
               ) : (
                 /* Cash On Delivery View */

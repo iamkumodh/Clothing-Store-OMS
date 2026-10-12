@@ -1,33 +1,29 @@
-// payment and shipment component
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { mockDb } from '../../../api/mockDataStore';
 import type {
   Payment,
   BankTransferPayment,
-  CashOnDeliveryPayment,
   CustomerOrderWithDetails,
   CodCollectionStatus,
 } from '../../../types/oms';
 import { verifyBankTransfer, updateCodSettlement } from '../../../api/paymentApi';
+import { useAuth } from '../../module1_user/context/AuthContext';
 import {
   CreditCard,
   CheckCircle2,
   XCircle,
   Clock,
   Search,
-  Filter,
   Eye,
-  FileText,
-  AlertCircle,
   Truck,
-  ArrowRight,
   ShieldCheck,
+  ShieldAlert,
   X,
   ZoomIn,
 } from 'lucide-react';
 
 export function PaymentManagementView() {
+  const { user, staffProfile } = useAuth();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [orders, setOrders] = useState<CustomerOrderWithDetails[]>([]);
   const [activeTab, setActiveTab] = useState<'BANK_TRANSFER' | 'COD'>('BANK_TRANSFER');
@@ -81,14 +77,78 @@ export function PaymentManagementView() {
     return cod?.cashCollectionStatus !== 'REMITTED_TO_STORE';
   }).length;
 
+  // Resolve current active staff profile dynamically
+  const currentStaff = useMemo(() => {
+    if (staffProfile) return staffProfile;
+    if (user) {
+      const s = mockDb.getStaffByUserId(user.userId);
+      if (s) {
+        return {
+          staffId: s.staffId,
+          userId: s.userId,
+          email: user.email,
+          firstName: s.firstName,
+          lastName: s.lastName,
+          designation: s.designation,
+          clearanceLevel: s.clearanceLevel,
+        };
+      }
+    }
+    return null;
+  }, [user, staffProfile]);
+
+  const currentStaffId = currentStaff?.staffId || 1;
+
+  // Segregation of Duties check: whether order is owned or assisted by current staff
+  const checkIsSelfOrder = (order?: CustomerOrderWithDetails | null) => {
+    if (!order) return false;
+    const currentUserId = user?.userId;
+    const currentUserEmail = user?.email?.toLowerCase();
+
+    // 1. Order customer email matches current user's email
+    if (currentUserEmail && order.customerEmail && order.customerEmail.toLowerCase() === currentUserEmail) {
+      return true;
+    }
+
+    // 2. Order customer record links to current user's userId
+    const customer = mockDb.getCustomerById(order.customerId);
+    if (currentUserId && customer && customer.userId === currentUserId) {
+      return true;
+    }
+
+    // 3. Customer email matches user email
+    if (currentUserEmail && customer && customer.email.toLowerCase() === currentUserEmail) {
+      return true;
+    }
+
+    // 4. Staff member assisted this order
+    if (currentStaff && order.assistedByStaffId === currentStaff.staffId) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const isSelfVerification = useMemo(() => {
+    return checkIsSelfOrder(inspectingPayment?.order);
+  }, [inspectingPayment, user, staffProfile, currentStaff]);
+
   // Handle Slip Verification
   const handleVerifySlip = async (approved: boolean) => {
     if (!inspectingPayment) return;
+
+    if (isSelfVerification) {
+      alert(
+        'Segregation of Duties Violation: Company financial compliance prohibits self-approval of payment receipts. Another staff member must inspect and verify this deposit slip.'
+      );
+      return;
+    }
+
     setLoading(true);
     try {
       await verifyBankTransfer(
         inspectingPayment.payment.paymentId,
-        1, // Chaminda Perera / Staff
+        currentStaffId,
         approved,
         approved ? undefined : rejectionReason
       );
@@ -348,7 +408,17 @@ export function PaymentManagementView() {
                         </td>
 
                         <td className="py-3 px-4">
-                          <div className="font-medium text-zinc-900">{order?.customerName || 'Customer'}</div>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-medium text-zinc-900">{order?.customerName || 'Customer'}</span>
+                            {checkIsSelfOrder(order) && (
+                              <span
+                                className="px-1.5 py-0.5 bg-amber-100 text-amber-800 border border-amber-300 text-[9px] font-mono font-semibold uppercase tracking-wider"
+                                title="Segregation of Duties: Ordered under your account. Peer verification required."
+                              >
+                                Self-Order (SoD)
+                              </span>
+                            )}
+                          </div>
                           <div className="text-[10px] text-zinc-500 font-mono">{order?.customerPhone}</div>
                         </td>
 
@@ -617,13 +687,39 @@ export function PaymentManagementView() {
                 />
               </div>
 
+              {/* Segregation of Duties (SoD) Warning Banner */}
+              {isSelfVerification && (
+                <div className="bg-amber-50 border border-amber-300 p-4 text-amber-900 flex items-start gap-3">
+                  <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <h4 className="font-semibold text-xs uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+                      <span>Segregation of Duties (SoD) Restriction</span>
+                      <span className="text-[10px] bg-amber-200/80 text-amber-900 px-1.5 py-0.2 rounded font-mono">
+                        Rule 4-Eyes Compliance
+                      </span>
+                    </h4>
+                    <p className="text-[11px] text-amber-700 leading-relaxed">
+                      You are recognized as the customer or order assistant for Order{' '}
+                      <strong>{inspectingPayment.order?.orderNumber || inspectingPayment.payment.orderId}</strong>.
+                      Organizational financial governance and dual-custody audit rules prohibit approving or rejecting
+                      your own payment receipts. Please have another authorized store officer or manager verify this deposit slip.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-zinc-200">
                 <button
                   type="button"
-                  disabled={loading}
+                  disabled={loading || isSelfVerification}
                   onClick={() => handleVerifySlip(false)}
-                  className="w-full sm:w-auto h-10 px-5 bg-white hover:bg-rose-50 text-rose-700 border border-rose-300 text-xs uppercase tracking-wider font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                  className={`w-full sm:w-auto h-10 px-5 text-xs uppercase tracking-wider font-semibold transition-colors flex items-center justify-center gap-1.5 ${
+                    isSelfVerification
+                      ? 'bg-zinc-100 text-zinc-400 border border-zinc-200 cursor-not-allowed'
+                      : 'bg-white hover:bg-rose-50 text-rose-700 border border-rose-300 cursor-pointer'
+                  }`}
+                  title={isSelfVerification ? 'Segregation of duties: You cannot reject your own order slip' : undefined}
                 >
                   <XCircle className="w-4 h-4" />
                   <span>Reject Deposit Slip</span>
@@ -631,12 +727,17 @@ export function PaymentManagementView() {
 
                 <button
                   type="button"
-                  disabled={loading}
+                  disabled={loading || isSelfVerification}
                   onClick={() => handleVerifySlip(true)}
-                  className="w-full sm:w-auto h-10 px-6 bg-black hover:bg-zinc-800 text-white text-xs uppercase tracking-wider font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                  className={`w-full sm:w-auto h-10 px-6 text-xs uppercase tracking-wider font-semibold transition-colors flex items-center justify-center gap-1.5 ${
+                    isSelfVerification
+                      ? 'bg-zinc-200 text-zinc-400 cursor-not-allowed'
+                      : 'bg-black hover:bg-zinc-800 text-white cursor-pointer'
+                  }`}
+                  title={isSelfVerification ? 'Segregation of duties: You cannot approve your own order slip' : undefined}
                 >
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Approve Slip &amp; Mark Order Paid</span>
+                  <CheckCircle2 className={`w-4 h-4 ${isSelfVerification ? 'text-zinc-400' : 'text-emerald-400'}`} />
+                  <span>{isSelfVerification ? 'Self-Verification Locked (SoD)' : 'Approve Slip & Mark Order Paid'}</span>
                 </button>
               </div>
             </div>

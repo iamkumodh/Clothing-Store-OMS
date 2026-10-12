@@ -5,13 +5,10 @@ import { mockDb } from './mockDataStore';
 import type {
   CourierPartner,
   DeliveryShipment,
-  ShipmentWithCourier,
   VerifySlipDto,
   DispatchOrderDto,
   UpdateCodStatusDto,
   Invoice,
-  Payment,
-  BankTransferPayment,
   CashOnDeliveryPayment,
 } from '../types/oms';
 

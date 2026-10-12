@@ -7,13 +7,11 @@ import {
   Plus,
   Search,
   Filter,
-  Eye,
   Edit2,
   Check,
   X,
   Package,
   Layers,
-  Sparkles,
 } from 'lucide-react';
 
 export function ProductCatalogView() {

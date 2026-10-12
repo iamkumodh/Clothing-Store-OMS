@@ -16,16 +16,11 @@ import {
 import { LiveTrackingModal } from './LiveTrackingModal';
 import {
   Truck,
-  Package,
   Plus,
   Search,
-  Filter,
   CheckCircle2,
   Clock,
   MapPin,
-  ExternalLink,
-  RotateCcw,
-  AlertCircle,
   Eye,
   ShieldCheck,
   X,

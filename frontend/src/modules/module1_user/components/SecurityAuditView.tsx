@@ -1,7 +1,7 @@
 // Security Login Audit Log Explorer & Intrusion Tracking View
 
 import { useState, useEffect } from 'react';
-import { UserLoginAuditRecord, AuditStatus } from '../types';
+import { UserLoginAuditRecord } from '../types';
 import { module1Api } from '../api/module1ApiClient';
 import { ShieldAlert, Search, RefreshCw } from 'lucide-react';
 

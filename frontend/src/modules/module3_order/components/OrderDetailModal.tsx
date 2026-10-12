@@ -11,16 +11,13 @@ import {
   X,
   Package,
   Calendar,
-  CreditCard,
   Truck,
-  FileText,
   Clock,
   CheckCircle2,
   AlertTriangle,
   RotateCcw,
   User,
   MapPin,
-  ExternalLink,
 } from 'lucide-react';
 
 interface OrderDetailModalProps {

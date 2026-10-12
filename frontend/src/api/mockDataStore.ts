@@ -3103,7 +3103,24 @@ export class MockDataStore {
 
     const staff = this.getStaffById(dto.staffId);
     const staffUserId = staff ? staff.userId : null;
+    const staffUser = staffUserId ? this.getUserById(staffUserId) : null;
+    const customer = this.getCustomerById(order.customerId);
     const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
+
+    // Segregation of Duties (SoD) & Dual-Control Validation
+    // A staff member cannot verify or approve a bank deposit slip for an order they placed or assisted.
+    const isSelfVerification = Boolean(
+      (customer && staff && customer.userId === staff.userId) ||
+      (staffUser && customer && customer.email.toLowerCase() === staffUser.email.toLowerCase()) ||
+      (staffUser && order.customerEmail && order.customerEmail.toLowerCase() === staffUser.email.toLowerCase()) ||
+      (order.assistedByStaffId != null && staff != null && order.assistedByStaffId === staff.staffId)
+    );
+
+    if (isSelfVerification) {
+      throw new Error(
+        'Segregation of Duties Violation: Store staff cannot verify payment slips for their own orders. Another authorized staff member must conduct this verification.'
+      );
+    }
 
     btPayment.verifiedByStaffId = dto.staffId;
     btPayment.verifiedAt = now;

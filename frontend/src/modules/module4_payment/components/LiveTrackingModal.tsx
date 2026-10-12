@@ -5,13 +5,9 @@ import { mockDb } from '../../../api/mockDataStore';
 import {
   X,
   Truck,
-  CheckCircle2,
-  Clock,
-  MapPin,
   ExternalLink,
   Copy,
   Check,
-  Package,
 } from 'lucide-react';
 
 interface LiveTrackingModalProps {
