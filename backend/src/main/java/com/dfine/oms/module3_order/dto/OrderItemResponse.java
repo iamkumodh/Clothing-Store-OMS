@@ -6,9 +6,11 @@ public class OrderItemResponse {
 
     private Integer orderItemId;
     private Integer variantId;
+    private String productTitle;
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal subtotal;
+    private String customImageUrl;
 
     public OrderItemResponse() {}
 
@@ -19,6 +21,18 @@ public class OrderItemResponse {
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.subtotal = subtotal;
+    }
+
+    public OrderItemResponse(Integer orderItemId, Integer variantId, String productTitle,
+                             Integer quantity, BigDecimal unitPrice, BigDecimal subtotal,
+                             String customImageUrl) {
+        this.orderItemId = orderItemId;
+        this.variantId = variantId;
+        this.productTitle = productTitle;
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
+        this.subtotal = subtotal;
+        this.customImageUrl = customImageUrl;
     }
 
     public Integer getOrderItemId() {
@@ -33,6 +47,13 @@ public class OrderItemResponse {
     }
     public void setVariantId(Integer variantId) {
         this.variantId = variantId;
+    }
+
+    public String getProductTitle() {
+        return productTitle;
+    }
+    public void setProductTitle(String productTitle) {
+        this.productTitle = productTitle;
     }
 
     public Integer getQuantity() {
@@ -54,5 +75,12 @@ public class OrderItemResponse {
     }
     public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
+    }
+
+    public String getCustomImageUrl() {
+        return customImageUrl;
+    }
+    public void setCustomImageUrl(String customImageUrl) {
+        this.customImageUrl = customImageUrl;
     }
 }

@@ -65,7 +65,7 @@ export const defaultCouriers: CourierOption[] = [
 export async function fetchCouriers(): Promise<CourierOption[]> {
   return executeWithFallback(
     async () => {
-      const res = await apiClient.get<CourierPartner[]>('/courier');
+      const res = await apiClient.get<CourierPartner[]>('/couriers');
       return (res.data || []).map((c) => ({
         courierId: c.courierId,
         courierName: c.courierName,

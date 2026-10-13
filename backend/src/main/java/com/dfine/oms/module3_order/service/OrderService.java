@@ -10,6 +10,8 @@ import java.util.List;
 // Service interface managing cart checkout, order lifecycle, and cross-module status synchronization
 public interface OrderService {
 
+    OrderResponse checkoutJson(OrderResponse.CheckoutRequest request);
+
     CustomerOrder checkout(Integer cartId, Integer customerId,
                           String customerName, String customerEmail,
                           String customerPhone, String shippingAddress,
@@ -24,4 +26,8 @@ public interface OrderService {
     CustomerOrder updateStatus(Integer orderId, String newStatus, Integer changedByUserId, String note);
 
     OrderResponse buildOrderResponse(Integer orderId);
+
+    OrderResponse getOrderByIdOrNumber(String idOrNumber);
+
+    List<CustomerOrder> getAllOrders();
 }
