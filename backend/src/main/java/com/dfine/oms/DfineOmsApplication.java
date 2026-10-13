@@ -1,11 +1,11 @@
-package com.dfine.dfineoms;
+package com.dfine.oms;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.dfine.oms", "com.dfine.dfineoms", "com.defineoms"})
 public class DfineOmsApplication {
 
     public static void main(String[] args) {
