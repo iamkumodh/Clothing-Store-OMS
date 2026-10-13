@@ -35,12 +35,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Explicitly permit all preflight OPTIONS requests so the browser isn't blocked
+                        // explicitly permits all preflight OPTIONS requests so the browser isn't blocked
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // 2. Cover both the exact string and the Spring Security "ROLE_" prefixed format
+                        // covers both the exact string and the Spring Security format
                         .requestMatchers("/api/admin/**").hasAnyAuthority(
                                 "ADMIN", "MANAGER", "STORE_STAFF",
                                 "ROLE_ADMIN", "ROLE_MANAGER", "ROLE_STORE_STAFF"

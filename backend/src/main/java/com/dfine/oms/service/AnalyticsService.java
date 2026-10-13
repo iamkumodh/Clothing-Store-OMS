@@ -15,10 +15,10 @@ public class AnalyticsService {
     private CustomerRepository customerRepository;
 
     public AnalyticsSummary getStoreAnalytics() {
-        // Live data from the database
+        // live data from the database
         long totalCustomers = customerRepository.count();
 
-        // Mock data to scaffold the frontend dashboard
+        // mock data for the frontend dashboard
         long totalOrders = 156;
         double totalRevenue = 45250.50;
 

@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface StoreStaffRepository extends JpaRepository<StoreStaff, Long> {
 
-    // Matches the exact "appUser" variable name defined in your StoreStaff.java entity
+    // matches the exact "appUser" variable name defined in your StoreStaff entity
     @Query("SELECT s FROM StoreStaff s WHERE s.appUser.email = :email")
     Optional<StoreStaff> findByUserEmail(@Param("email") String email);
 }

@@ -1,3 +1,4 @@
+// capture and hold staff info
 package com.dfine.dfineoms.dto;
 
 public class StaffRegistrationRequest {

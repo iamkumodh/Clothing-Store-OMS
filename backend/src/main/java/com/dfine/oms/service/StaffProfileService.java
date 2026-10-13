@@ -14,8 +14,6 @@ public class StaffProfileService {
     private StoreStaffRepository staffRepository;
 
     public StoreStaff getProfileByEmail(String email) {
-        // Assuming your StoreStaff entity has a relationship to AppUser.
-        // Adjust "findByUserEmail" if your repository naming convention differs.
         return staffRepository.findByUserEmail(email)
                 .orElseThrow(() -> new RuntimeException("Staff profile not found for email: " + email));
     }
@@ -24,7 +22,7 @@ public class StaffProfileService {
         StoreStaff existingStaff = staffRepository.findByUserEmail(email)
                 .orElseThrow(() -> new RuntimeException("Staff profile not found for email: " + email));
 
-        // Staff tables do not have shipping addresses, so we only update names
+        // staff tables do not have shipping addresses, therefore only updates names
         existingStaff.setFirstName(updatedProfile.get("firstName"));
         existingStaff.setLastName(updatedProfile.get("lastName"));
 

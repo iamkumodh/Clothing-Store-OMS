@@ -13,21 +13,20 @@ public class CustomerProfileService {
     @Autowired
     private CustomerRepository customerRepository;
 
-    // 1. Fetch Profile Data on Load
+    // fetch profile data on load
     public Customer getProfileByEmail(String email) {
-        // Find the customer linked to the JWT email.
-        // Ensure your CustomerRepository has a method like findByEmail(String email)
+        // finds the customer linked to the JWT email
         return customerRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Profile not found for email: " + email));
     }
 
-    // 2. Save Updated Profile Data
+    // saves updated profile data
     public void updateProfile(String email, Map<String, String> updatedProfile) {
-        // Fetch the existing record
+        // fetches the existing record
         Customer existingCustomer = customerRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Profile not found for email: " + email));
 
-        // Update the entity with the new values from the React frontend
+        // updates the entity with the new values from the React frontend
         existingCustomer.setFirstName(updatedProfile.get("firstName"));
         existingCustomer.setLastName(updatedProfile.get("lastName"));
         existingCustomer.setContactNumber(updatedProfile.get("contactNumber"));
@@ -37,7 +36,7 @@ public class CustomerProfileService {
         existingCustomer.setProvince(updatedProfile.get("province"));
         existingCustomer.setPostalCode(updatedProfile.get("postalCode"));
 
-        // Save the changes back to the database
+        // saves the changes back to the database
         customerRepository.save(existingCustomer);
     }
 }

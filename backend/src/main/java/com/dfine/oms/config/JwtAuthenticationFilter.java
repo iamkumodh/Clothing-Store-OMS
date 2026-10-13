@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // saves it to the context so controllers can extract the Principal and roles are enforced
+                // saves it to the context so controllers can extract the principal and roles are enforced
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }

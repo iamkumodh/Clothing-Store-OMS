@@ -16,18 +16,18 @@ public class ProfileController {
     @Autowired
     private CustomerProfileService profileService;
 
-    // Handles the on-load fetch
+    // handles the on-load fetch
     @GetMapping
     public ResponseEntity<?> getProfile(Principal principal) {
-        // principal.getName() safely extracts the email from the JWT
+        // safely extracts the email from the JWT
         Object profileData = profileService.getProfileByEmail(principal.getName());
         return ResponseEntity.ok(profileData);
     }
 
-    // Handles the "Update Profile" form submission
+    // handles the "Update Profile" form submission
     @PutMapping
     public ResponseEntity<?> updateProfile(@RequestBody Map<String, String> updateData, Principal principal) {
-        // Passes the update data to the service layer we built earlier
+        // passes the update data to the service layer
         profileService.updateProfile(principal.getName(), updateData);
         return ResponseEntity.ok("Profile updated successfully");
     }

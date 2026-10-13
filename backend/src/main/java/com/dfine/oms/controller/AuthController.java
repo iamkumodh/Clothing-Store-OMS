@@ -164,7 +164,7 @@ public class AuthController {
 
         AppUser user = userOptional.get();
 
-        // Check how many tokens were generated in the last hour
+        // checks how many tokens were generated in the last hour
         LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
         int recentRequests = tokenRepository.countByUser_UserIdAndCreatedAtAfter(Math.toIntExact(user.getUserId()), oneHourAgo);
 
@@ -174,10 +174,10 @@ public class AuthController {
 
         tokenRepository.deleteByUser_UserId(Math.toIntExact(user.getUserId()));
 
-        // Generate the raw token to send to the user
+        // generates the raw token to send to the user
         String rawToken = UUID.randomUUID().toString();
 
-        // Hash the token before saving it to the database
+        // hashes the token before saving it to the database
         String hashedToken = hashToken(rawToken);
 
         PasswordResetToken resetToken = new PasswordResetToken(
@@ -187,8 +187,9 @@ public class AuthController {
         );
         tokenRepository.save(resetToken);
 
+        // password reset check
         System.out.println("\n=== MOCK EMAIL ===");
-        // Important: Send the RAW token in the email, not the hashed one
+        // sends the RAW token in the email, not the hashed one
         System.out.println("http://localhost:5173/reset-password?token=" + rawToken);
         System.out.println("==================\n");
 
@@ -200,7 +201,7 @@ public class AuthController {
         String rawToken = request.get("token");
         String newPassword = request.get("newPassword");
 
-        // Hash the incoming raw token to find its match in the database
+        // hashes the incoming raw token to find its match in the database
         String hashedToken = hashToken(rawToken);
         Optional<PasswordResetToken> tokenOptional = tokenRepository.findByTokenHash(hashedToken);
 
@@ -210,12 +211,12 @@ public class AuthController {
 
         PasswordResetToken resetToken = tokenOptional.get();
 
-        // Check if the token was already used
+        // checks if the token was already used
         if (resetToken.getUsedAt() != null) {
             return ResponseEntity.badRequest().body("This reset link has already been used.");
         }
 
-        // Check if the token has expired
+        // checks if the token has expired
         if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
             return ResponseEntity.badRequest().body("Token has expired. Please request a new one.");
         }
@@ -224,7 +225,7 @@ public class AuthController {
         user.setPasswordHash(passwordEncoder.encode(newPassword)); // Update this setter if needed
         userRepository.save(user);
 
-        // Audit trail: Mark the token as used instead of deleting it
+        // Audit trail -> marks the token as used instead of deleting it
         resetToken.setUsedAt(LocalDateTime.now());
         tokenRepository.save(resetToken);
 
