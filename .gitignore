@@ -79,3 +79,6 @@ temp/
 frontend/public/images/*
 !frontend/public/images/.gitkeep
 !frontend/public/images/dfine-logo-*.png
+!frontend/public/images/hero-streetwear-portrait.webp
+!frontend/public/images/products/
+!frontend/public/images/products/**

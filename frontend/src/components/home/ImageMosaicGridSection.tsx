@@ -1,5 +1,5 @@
 /**
- * Lifestyle Image Mosaic Grid Section - T-Shirt Styling Stories
+ * Lifestyle Image Mosaic Grid Section - Streetwear Styling Stories
  */
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -7,46 +7,46 @@ import { Link } from 'react-router-dom';
 export function ImageMosaicGridSection() {
   const tiles = [
     {
-      title: 'Heavyweight Boxy Blanks',
-      subtitle: '260 GSM Structured',
-      image: '/images/coll-the-base-crew.png',
+      title: 'SPANDEX — B1',
+      subtitle: '240 GSM Pitch Black Stretch',
+      image: '/images/products/spx-b1-1.webp',
       span: 'col-span-1',
-      link: '/collections/all?gsm=260',
+      link: '/collections/spandex',
     },
     {
-      title: 'Boxy Cropped Cuts',
-      subtitle: 'Women’s Streetwear',
-      image: '/images/coll-the-ines-tee.png',
+      title: 'SPANDEX — DB1',
+      subtitle: '260 GSM Washed Charcoal',
+      image: '/images/products/spx-db1-1.webp',
       span: 'col-span-1',
-      link: '/collections/women?fit=Boxy+Cropped',
+      link: '/collections/spandex',
     },
     {
-      title: 'Graphic Drops',
-      subtitle: 'Tokyo Drift & Cyberpunk',
-      image: '/images/coll-the-nico-tee.png',
+      title: 'SPANDEX — W1',
+      subtitle: '240 GSM Pure White',
+      image: '/images/products/spx-w1-1.webp',
       span: 'col-span-1',
-      link: '/collections/unisex?category=Graphic+Tees',
+      link: '/collections/spandex',
     },
     {
-      title: 'Yarn-Dyed Stripe Series',
-      subtitle: 'Double-Knitted Cotton',
-      image: '/images/coll-the-finn-stripe-tee.png',
+      title: 'TERRY — G1',
+      subtitle: '260 GSM Olive Green Micro-Loop',
+      image: '/images/products/try-g1-1.webp',
       span: 'col-span-1',
-      link: '/collections/men',
+      link: '/collections/terry',
     },
     {
-      title: 'Vintage Garment Washed',
-      subtitle: 'Soft Lived-in Texture',
-      image: '/images/coll-the-form-long-sleeve.png',
+      title: 'TERRY — LB1',
+      subtitle: '260 GSM Muted Light Blue',
+      image: '/images/products/try-lb1-1.webp',
       span: 'col-span-1 sm:col-span-2',
-      link: '/collections/all?category=Vintage+Washed',
+      link: '/collections/terry',
     },
     {
-      title: 'Everyday Pima Basics',
-      subtitle: '180 GSM Pure Comfort',
-      image: '/images/coll-the-rib-tee.png',
+      title: '2026 Streetwear Editorial',
+      subtitle: 'Spandex • French Terry • Dye',
+      image: '/images/hero-streetwear-portrait.webp',
       span: 'col-span-1 sm:col-span-2',
-      link: '/collections/all?gsm=180',
+      link: '/collections/all',
     },
   ];
 
@@ -55,35 +55,35 @@ export function ImageMosaicGridSection() {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-8">
         <div className="flex flex-col items-center text-center mb-12">
           <span className="text-[11px] font-bold tracking-[0.2em] text-neutral-400 uppercase">
-            Stylebook & Edits
+            Stylebook & Lookbook
           </span>
           <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-neutral-900 mt-1">
-            Engineered for Everyday Styling
+            Streetwear Silhouettes in Motion
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {tiles.map((tile, idx) => (
             <Link
               key={idx}
               to={tile.link}
-              className={`group relative aspect-[4/3] rounded-[2px] overflow-hidden bg-neutral-100 border border-zinc-200 flex flex-col justify-end p-5 text-white ${tile.span}`}
+              className={`group relative overflow-hidden rounded-[2px] bg-neutral-900 aspect-[3/4] ${tile.span} border border-zinc-200 shadow-xs hover:shadow-md transition-shadow`}
             >
               <img
                 src={tile.image}
                 alt={tile.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent transition-opacity group-hover:opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent pointer-events-none" />
 
-              <div className="relative z-10">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-white/70 block mb-0.5">
+              <div className="absolute bottom-0 left-0 p-5 text-white z-10">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-300">
                   {tile.subtitle}
                 </span>
-                <span className="text-base sm:text-lg font-semibold tracking-wide text-white">
+                <h3 className="text-lg font-semibold text-white mt-0.5">
                   {tile.title}
-                </span>
+                </h3>
               </div>
             </Link>
           ))}

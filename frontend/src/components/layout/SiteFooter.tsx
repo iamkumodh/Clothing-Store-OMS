@@ -30,8 +30,8 @@ export function SiteFooter() {
           <div className="space-y-4">
             <DfineLogo className="text-black" />
             <p className="text-[13px] text-zinc-500 font-light leading-relaxed max-w-[280px]">
-              Effortless everyday apparel thoughtfully crafted from breathable natural linen,
-              organic cotton, and soft knits.
+              Precision streetwear apparel thoughtfully crafted from heavyweight spandex stretch,
+              French Terry, and garment-dyed cotton.
             </p>
             <div className="flex items-center gap-4 pt-1 text-zinc-500">
               <a
@@ -80,23 +80,23 @@ export function SiteFooter() {
             </h4>
             <ul className="space-y-2.5 text-[13px] text-zinc-600">
               <li>
-                <Link to="#all-new" className="hover:text-black transition-colors">
-                  New Arrivals
+                <Link to="/collections/spandex" className="hover:text-black transition-colors">
+                  Spandex Series
                 </Link>
               </li>
               <li>
-                <Link to="#essentials" className="hover:text-black transition-colors">
-                  Best Sellers
+                <Link to="/collections/terry" className="hover:text-black transition-colors">
+                  French Terry
                 </Link>
               </li>
               <li>
-                <Link to="/collections/2026-new" className="hover:text-black transition-colors">
-                  Dresses
+                <Link to="/collections/dye" className="hover:text-black transition-colors">
+                  Garment Dye
                 </Link>
               </li>
               <li>
-                <Link to="/collections/2026-new" className="hover:text-black transition-colors">
-                  Tees & Tops
+                <Link to="/collections/all" className="hover:text-black transition-colors">
+                  All T-Shirts
                 </Link>
               </li>
               <li>

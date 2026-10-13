@@ -9,8 +9,8 @@ import { useDfineStore } from '../context/store-context';
 import { SearchIcon, CloseIcon } from '../components/common/icons';
 import { SlidersHorizontal, ArrowRight } from 'lucide-react';
 
-const SUGGESTED_SEARCHES = ['Knit', 'Linen', 'Blazer', 'Coat', 'Trouser', 'Overshirt', 'Tee'];
-const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Dresses', 'Layers', 'Sets'];
+const SUGGESTED_SEARCHES = ['Spandex', 'French Terry', 'Garment Dye', 'B1', 'DB1', 'G1', 'W1'];
+const CATEGORIES = ['All', 'Spandex', 'Terry', 'Dye'];
 
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();

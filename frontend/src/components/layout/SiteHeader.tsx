@@ -93,64 +93,27 @@ export function SiteHeader({ variant = 'overlay' }: { variant?: 'overlay' | 'sol
                 </button>
               </div>
 
-              {/* Left Navigation: Men, Women, Unisex, GSM Guide, Sale */}
-              <nav className="hidden lg:flex items-center gap-6 text-[13px] font-medium tracking-wide">
-                {/* Men's Megamenu */}
-                <div
-                  className="relative py-5 cursor-pointer flex items-center gap-1 group"
-                  onMouseEnter={() => setActiveMegamenu('men')}
-                >
-                  <Link
-                    to="/collections/men"
-                    className="hover:opacity-80 transition-opacity relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform"
-                  >
-                    Men
-                  </Link>
-                  <ChevronDownIcon className="w-2.5 h-2.5 opacity-70 group-hover:rotate-180 transition-transform" />
-                </div>
-
-                {/* Women's Megamenu */}
-                <div
-                  className="relative py-5 cursor-pointer flex items-center gap-1 group"
-                  onMouseEnter={() => setActiveMegamenu('women')}
-                >
-                  <Link
-                    to="/collections/women"
-                    className="hover:opacity-80 transition-opacity relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform"
-                  >
-                    Women
-                  </Link>
-                  <ChevronDownIcon className="w-2.5 h-2.5 opacity-70 group-hover:rotate-180 transition-transform" />
-                </div>
-
-                {/* Unisex Megamenu */}
-                <div
-                  className="relative py-5 cursor-pointer flex items-center gap-1 group"
-                  onMouseEnter={() => setActiveMegamenu('unisex')}
-                >
-                  <Link
-                    to="/collections/unisex"
-                    className="hover:opacity-80 transition-opacity relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform"
-                  >
-                    Unisex & Streetwear
-                  </Link>
-                  <ChevronDownIcon className="w-2.5 h-2.5 opacity-70 group-hover:rotate-180 transition-transform" />
-                </div>
-
-                {/* GSM Guide Anchor */}
-                <a
-                  href="/#gsm-guide"
+              {/* Left Navigation: Spandex, French Terry, Garment Dye */}
+              <nav className="hidden lg:flex items-center gap-7 text-[13px] font-medium tracking-wide">
+                <Link
+                  to="/collections/spandex"
                   className="hover:opacity-80 transition-opacity relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
                 >
-                  GSM & Fit Guide
-                </a>
+                  Spandex
+                </Link>
 
-                {/* Sale Link */}
                 <Link
-                  to="/collections/sale"
-                  className="hover:opacity-80 transition-opacity text-rose-400 hover:text-rose-500 relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
+                  to="/collections/terry"
+                  className="hover:opacity-80 transition-opacity relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
                 >
-                  Sale
+                  French Terry
+                </Link>
+
+                <Link
+                  to="/collections/dye"
+                  className="hover:opacity-80 transition-opacity relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[1.5px] after:bg-current after:scale-x-0 hover:after:scale-x-100 after:transition-transform"
+                >
+                  Garment Dye
                 </Link>
               </nav>
             </div>

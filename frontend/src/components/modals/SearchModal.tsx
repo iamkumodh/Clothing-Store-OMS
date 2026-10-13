@@ -12,7 +12,7 @@ import { Product } from '../common/types';
 import { CloseIcon, SearchIcon } from '../common/icons';
 import { ArrowRight, CornerDownLeft } from 'lucide-react';
 
-const SUGGESTED_SEARCHES = ['Linen', 'Ceru Knit', 'Wren Coat', 'Trouser', 'Blazer', 'Tee'];
+const SUGGESTED_SEARCHES = ['Spandex', 'French Terry', 'Garment Dye', 'B1', 'DB1', 'G1', 'W1'];
 
 export function SearchModal() {
   const { isSearchOpen, setIsSearchOpen, addToCart } = useDfineStore();

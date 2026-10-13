@@ -14,7 +14,7 @@ export function FeaturedCategoriesSection() {
             Curated Categories
           </span>
           <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-neutral-900 mt-1">
-            Shop by Silhouette & Gender
+            Shop by Fabric & Silhouette
           </h2>
         </div>
 
