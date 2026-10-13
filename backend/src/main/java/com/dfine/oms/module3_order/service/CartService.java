@@ -1,9 +1,9 @@
-package com.defineoms.defineoms.service;
+package com.dfine.oms.module3_order.service;
 
-import com.defineoms.defineoms.entity.Cart;
-import com.defineoms.defineoms.repository.CartRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dfine.oms.module3_order.entity.Cart;
+import com.dfine.oms.module3_order.repository.CartRepository;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -11,41 +11,32 @@ import java.util.Optional;
 @Service
 public class CartService {
 
-    @Autowired
-    private CartRepository cartRepository;
+    private final CartRepository cartRepository;
 
-    // Get an existing cart for a customer, or create a new one.
+    public CartService(CartRepository cartRepository) {
+        this.cartRepository = cartRepository;
+    }
+
     public Cart getOrCreateCart(Integer customerId) {
-
         Optional<Cart> existingCart = cartRepository.findByCustomerId(customerId);
-
         if (existingCart.isPresent()) {
-
             return existingCart.get();
-
         } else {
-
             Cart newCart = new Cart();
             newCart.setCustomerId(customerId);
             newCart.setCreatedAt(LocalDateTime.now());
             newCart.setUpdatedAt(LocalDateTime.now());
-
             return cartRepository.save(newCart);
         }
     }
 
-    // Get an existing cart for a GUEST (no account), or create one.
     public Cart getOrCreateGuestCart(String guestToken) {
-
         Optional<Cart> existingCart = cartRepository.findByGuestToken(guestToken);
-
         if (existingCart.isPresent()) {
             return existingCart.get();
-
         } else {
             Cart newCart = new Cart();
-            newCart.setGuestToken(guestToken);   // customerId stays null
-
+            newCart.setGuestToken(guestToken);
             newCart.setCreatedAt(LocalDateTime.now());
             newCart.setUpdatedAt(LocalDateTime.now());
             return cartRepository.save(newCart);

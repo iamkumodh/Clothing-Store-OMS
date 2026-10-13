@@ -1,28 +1,48 @@
-package com.defineoms.defineoms.service;
+package com.dfine.oms.module3_order.service;
 
-import com.defineoms.defineoms.entity.*;
-import com.defineoms.defineoms.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dfine.oms.module3_order.dto.OrderItemResponse;
+import com.dfine.oms.module3_order.dto.OrderResponse;
+import com.dfine.oms.module3_order.entity.Cart;
+import com.dfine.oms.module3_order.entity.CartItem;
+import com.dfine.oms.module3_order.entity.CustomerOrder;
+import com.dfine.oms.module3_order.entity.OrderItem;
+import com.dfine.oms.module3_order.entity.OrderStatusHistory;
+import com.dfine.oms.module3_order.repository.CartItemRepository;
+import com.dfine.oms.module3_order.repository.CartRepository;
+import com.dfine.oms.module3_order.repository.CustomerOrderRepository;
+import com.dfine.oms.module3_order.repository.OrderItemRepository;
+import com.dfine.oms.module3_order.repository.OrderStatusHistoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import com.defineoms.defineoms.dto.OrderResponse;
-import com.defineoms.defineoms.dto.OrderItemResponse;
-import java.util.ArrayList;
 
 @Service
-public class OrderService {
+public class OrderServiceImpl implements OrderService {
 
-    @Autowired private CustomerOrderRepository orderRepository;
-    @Autowired private OrderItemRepository orderItemRepository;
-    @Autowired private OrderStatusHistoryRepository historyRepository;
-    @Autowired private CartRepository cartRepository;
-    @Autowired private CartItemRepository cartItemRepository;
+    private final CustomerOrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final OrderStatusHistoryRepository historyRepository;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
 
+    public OrderServiceImpl(CustomerOrderRepository orderRepository,
+                            OrderItemRepository orderItemRepository,
+                            OrderStatusHistoryRepository historyRepository,
+                            CartRepository cartRepository,
+                            CartItemRepository cartItemRepository) {
+        this.orderRepository = orderRepository;
+        this.orderItemRepository = orderItemRepository;
+        this.historyRepository = historyRepository;
+        this.cartRepository = cartRepository;
+        this.cartItemRepository = cartItemRepository;
+    }
 
+    @Override
     @Transactional
     public CustomerOrder checkout(Integer cartId, Integer customerId,
                                   String customerName, String customerEmail,
@@ -35,21 +55,18 @@ public class OrderService {
             throw new RuntimeException("Cannot checkout an empty cart");
         }
 
-
         BigDecimal subtotal = BigDecimal.ZERO;
         for (CartItem item : items) {
-
             BigDecimal unitPrice = new BigDecimal("1800.00");
             BigDecimal lineTotal = unitPrice.multiply(new BigDecimal(item.getQuantity()));
             subtotal = subtotal.add(lineTotal);
         }
 
-        BigDecimal shippingFee = new BigDecimal("350.00"); // flat rate example
+        BigDecimal shippingFee = new BigDecimal("350.00");
         BigDecimal totalPayable = subtotal.add(shippingFee);
 
-
         CustomerOrder order = new CustomerOrder();
-        order.setOrderNumber("ORD-" + System.currentTimeMillis()); // simple
+        order.setOrderNumber("ORD-" + System.currentTimeMillis());
 
         order.setCustomerId(customerId);
         order.setOrderDate(LocalDateTime.now());
@@ -68,8 +85,7 @@ public class OrderService {
         CustomerOrder savedOrder = orderRepository.save(order);
 
         for (CartItem item : items) {
-            BigDecimal unitPrice = new BigDecimal("1800.00"); // same
-            // placeholder
+            BigDecimal unitPrice = new BigDecimal("1800.00");
             BigDecimal lineTotal = unitPrice.multiply(new BigDecimal(item.getQuantity()));
 
             OrderItem orderItem = new OrderItem();
@@ -80,16 +96,15 @@ public class OrderService {
             orderItem.setSubtotal(lineTotal);
             orderItem.setCustomImageUrl(item.getCustomImageUrl());
             orderItemRepository.save(orderItem);
-
         }
+
         OrderStatusHistory firstEntry = new OrderStatusHistory();
         firstEntry.setOrderId(savedOrder.getOrderId());
-        firstEntry.setPreviousStatus(null); // nothing before this, it's brand new
+        firstEntry.setPreviousStatus(null);
         firstEntry.setNewStatus("PENDING");
         firstEntry.setChangedAt(LocalDateTime.now());
         firstEntry.setNotes("Order placed by customer");
         historyRepository.save(firstEntry);
-
 
         cartItemRepository.deleteAll(items);
         Optional<Cart> cartBox = cartRepository.findById(cartId);
@@ -100,21 +115,22 @@ public class OrderService {
         return savedOrder;
     }
 
+    @Override
     public List<CustomerOrder> getOrderHistory(Integer customerId) {
         return orderRepository.findByCustomerIdOrderByOrderDateDesc(customerId);
     }
 
+    @Override
     public List<OrderItem> getOrderItems(Integer orderId) {
-
         return orderItemRepository.findByOrderId(orderId);
     }
 
+    @Override
     public List<OrderStatusHistory> getStatusHistory(Integer orderId) {
         return historyRepository.findByOrderIdOrderByChangedAtAsc(orderId);
     }
 
-
-
+    @Override
     @Transactional
     public CustomerOrder updateStatus(Integer orderId, String newStatus,
                                       Integer changedByUserId, String note) {
@@ -141,8 +157,9 @@ public class OrderService {
 
         return updatedOrder;
     }
-    public OrderResponse buildOrderResponse(Integer orderId) {
 
+    @Override
+    public OrderResponse buildOrderResponse(Integer orderId) {
         CustomerOrder order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -167,5 +184,4 @@ public class OrderService {
                 itemResponses
         );
     }
-
 }

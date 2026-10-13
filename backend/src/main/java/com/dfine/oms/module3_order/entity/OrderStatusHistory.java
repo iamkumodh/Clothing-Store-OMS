@@ -1,4 +1,4 @@
-package com.defineoms.defineoms.entity;
+package com.dfine.oms.module3_order.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -69,4 +69,3 @@ public class OrderStatusHistory {
         this.notes = notes;
     }
 }
-

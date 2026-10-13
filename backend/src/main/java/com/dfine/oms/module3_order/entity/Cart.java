@@ -1,4 +1,4 @@
-package com.defineoms.defineoms.entity;
+package com.dfine.oms.module3_order.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -11,14 +11,13 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer cartId;
 
-    private Integer customerId;      // nullable, guest checkout
+    private Integer customerId;
     private String guestToken;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public Cart() {}
 
-    // --- getters and setters ---
     public Integer getCartId() { return cartId; }
     public void setCartId(Integer cartId) { this.cartId = cartId; }
 

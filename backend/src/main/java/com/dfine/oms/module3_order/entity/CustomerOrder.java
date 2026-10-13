@@ -1,4 +1,4 @@
-package com.defineoms.defineoms.entity;
+package com.dfine.oms.module3_order.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "customer_order")
-
 public class CustomerOrder {
 
     @Id
@@ -15,7 +14,6 @@ public class CustomerOrder {
 
     private String orderNumber;
     private Integer customerId;
-
     private Integer assistedByStaffId;
 
     private LocalDateTime orderDate;
@@ -74,7 +72,6 @@ public class CustomerOrder {
     public String getOrderSource() {
         return orderSource;
     }
-
     public void setOrderSource(String orderSource) {
         this.orderSource = orderSource;
     }
@@ -82,7 +79,6 @@ public class CustomerOrder {
     public String getOrderStatus() {
         return orderStatus;
     }
-
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
     }
@@ -132,22 +128,21 @@ public class CustomerOrder {
     public String getShippingAddressSnapshot() {
         return shippingAddressSnapshot;
     }
-    public void setShippingAddressSnapshot(String v) {
-        this.shippingAddressSnapshot = v;
+    public void setShippingAddressSnapshot(String shippingAddressSnapshot) {
+        this.shippingAddressSnapshot = shippingAddressSnapshot;
     }
 
     public String getShippingDistrictSnapshot() {
         return shippingDistrictSnapshot;
     }
-    public void setShippingDistrictSnapshot(String v) {
-        this.shippingDistrictSnapshot = v;
+    public void setShippingDistrictSnapshot(String shippingDistrictSnapshot) {
+        this.shippingDistrictSnapshot = shippingDistrictSnapshot;
     }
 
     public String getShippingProvinceSnapshot() {
         return shippingProvinceSnapshot;
     }
-    public void setShippingProvinceSnapshot(String v) {
-        this.shippingProvinceSnapshot = v;
+    public void setShippingProvinceSnapshot(String shippingProvinceSnapshot) {
+        this.shippingProvinceSnapshot = shippingProvinceSnapshot;
     }
 }
-
