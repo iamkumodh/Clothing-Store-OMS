@@ -1,4 +1,4 @@
-package com.defineoms.defineoms.entity;
+package com.dfine.oms.module3_order.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -64,7 +64,6 @@ public class OrderItem {
     }
 
     public String getCustomImageUrl() {
-
         return customImageUrl;
     }
     public void setCustomImageUrl(String customImageUrl) {

@@ -1,4 +1,4 @@
-package com.defineoms.defineoms.entity;
+package com.dfine.oms.module3_order.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -14,7 +14,7 @@ public class CartItem {
     private Integer cartId;
     private Integer variantId;
     private Integer quantity;
-    private String customImageUrl;  // matches "custom_image_url" -- the
+    private String customImageUrl;
 
     private LocalDateTime addedAt;
 
@@ -38,4 +38,3 @@ public class CartItem {
     public LocalDateTime getAddedAt() { return addedAt; }
     public void setAddedAt(LocalDateTime addedAt) { this.addedAt = addedAt; }
 }
-

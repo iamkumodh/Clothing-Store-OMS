@@ -1,36 +1,32 @@
-package com.defineoms.defineoms.service;
+package com.dfine.oms.module3_order.service;
 
-import com.defineoms.defineoms.entity.ProductVariant;
-import com.defineoms.defineoms.repository.ProductVariantRepository;
-
-import com.defineoms.defineoms.entity.CartItem;
-import com.defineoms.defineoms.repository.CartItemRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dfine.oms.module2_product.entity.ProductVariant;
+import com.dfine.oms.module2_product.repository.ProductVariantRepository;
+import com.dfine.oms.module3_order.entity.CartItem;
+import com.dfine.oms.module3_order.repository.CartItemRepository;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-// @Service Spring creates it once and
-// hands it out wherever it's needed, so never needs to type "new CartItemService()").
 @Service
 public class CartItemService {
 
-    // @Autowired means CartItemRepository is
-    // just an interface (remember, it had no actual code inside it).
-    @Autowired
-    private CartItemRepository cartItemRepository;
+    private final CartItemRepository cartItemRepository;
+    private final ProductVariantRepository productVariantRepository;
 
-
-    @Autowired
-    private ProductVariantRepository productVariantRepository;
+    public CartItemService(CartItemRepository cartItemRepository,
+                           ProductVariantRepository productVariantRepository) {
+        this.cartItemRepository = cartItemRepository;
+        this.productVariantRepository = productVariantRepository;
+    }
 
     public CartItem addItemToCart(Integer cartId, Integer variantId, Integer quantity) {
-
         Optional<ProductVariant> variantBox = productVariantRepository.findById(variantId);
 
         if (!variantBox.isPresent()) {
-
             throw new RuntimeException("Product variant not found");
         }
         ProductVariant variant = variantBox.get();
@@ -43,13 +39,10 @@ public class CartItemService {
                 cartItemRepository.findByCartIdAndVariantId(cartId, variantId);
 
         if (existingBox.isPresent()) {
-
             CartItem item = existingBox.get();
             item.setQuantity(item.getQuantity() + quantity);
             return cartItemRepository.save(item);
-
         } else {
-
             CartItem newItem = new CartItem();
             newItem.setCartId(cartId);
             newItem.setVariantId(variantId);
@@ -60,7 +53,6 @@ public class CartItemService {
     }
 
     public List<CartItem> getItemsForCart(Integer cartId) {
-
         return cartItemRepository.findByCartId(cartId);
     }
 
@@ -77,7 +69,6 @@ public class CartItemService {
     }
 
     public void removeItem(Integer cartItemId) {
-
         cartItemRepository.deleteById(cartItemId);
     }
 
@@ -94,9 +85,11 @@ public class CartItemService {
             }
 
             ProductVariant variant = variantBox.get();
-            subtotal += item.getQuantity() * variant.getBasePrice();
+            BigDecimal price = (variant.getProduct() != null && variant.getProduct().getBasePrice() != null)
+                    ? variant.getProduct().getBasePrice()
+                    : BigDecimal.ZERO;
+            subtotal += item.getQuantity() * price.doubleValue();
         }
         return subtotal;
     }
 }
-

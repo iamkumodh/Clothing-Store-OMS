@@ -1,20 +1,23 @@
-package com.defineoms.defineoms.controller;
+package com.dfine.oms.module3_order.controller;
 
-import com.defineoms.defineoms.entity.CustomerOrder;
-import com.defineoms.defineoms.entity.OrderItem;
-import com.defineoms.defineoms.entity.OrderStatusHistory;
-import com.defineoms.defineoms.service.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dfine.oms.module3_order.dto.OrderResponse;
+import com.dfine.oms.module3_order.entity.CustomerOrder;
+import com.dfine.oms.module3_order.entity.OrderItem;
+import com.dfine.oms.module3_order.entity.OrderStatusHistory;
+import com.dfine.oms.module3_order.service.OrderService;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import com.defineoms.defineoms.dto.OrderResponse;
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
 
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
     @PostMapping("/checkout")
     public CustomerOrder checkout(@RequestParam Integer cartId,
@@ -44,7 +47,6 @@ public class OrderController {
         return orderService.getStatusHistory(orderId);
     }
 
-
     @PutMapping("/{orderId}/status")
     public CustomerOrder updateStatus(@PathVariable Integer orderId,
                                       @RequestParam String newStatus,
@@ -52,7 +54,6 @@ public class OrderController {
                                       @RequestParam(required = false) String note) {
         return orderService.updateStatus(orderId, newStatus, changedByUserId, note);
     }
-
 
     @GetMapping("/{orderId}/full")
     public OrderResponse getFullOrder(@PathVariable Integer orderId) {

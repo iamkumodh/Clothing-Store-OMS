@@ -1,4 +1,4 @@
-package com.defineoms.defineoms.dto;
+package com.dfine.oms.module3_order.dto;
 
 import java.math.BigDecimal;
 
@@ -10,8 +10,7 @@ public class OrderItemResponse {
     private BigDecimal unitPrice;
     private BigDecimal subtotal;
 
-    public OrderItemResponse() {
-    }
+    public OrderItemResponse() {}
 
     public OrderItemResponse(Integer orderItemId, Integer variantId, Integer quantity,
                              BigDecimal unitPrice, BigDecimal subtotal) {
