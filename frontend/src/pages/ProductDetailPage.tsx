@@ -826,7 +826,8 @@ export default function ProductDetailPage() {
   }, [handle]);
 
   const defaultProduct = dfineProducts[0];
-  const activeProduct = product || defaultProduct;
+  const matchedStaticProduct = dfineProducts.find(p => p.handle === handle);
+  const activeProduct = product || matchedStaticProduct || defaultProduct;
 
   const relatedProducts = dfineCollectionProducts
     .filter((p: Product) => p.handle !== activeProduct.handle)

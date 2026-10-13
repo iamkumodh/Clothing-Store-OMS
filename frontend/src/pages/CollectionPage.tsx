@@ -14,6 +14,7 @@ interface CollectionPageViewProps {
   initialProducts?: Product[];
   defaultGender?: 'ALL' | 'MEN' | 'WOMEN' | 'UNISEX';
   initialSaleOnly?: boolean;
+  initialCategory?: string;
 }
 
 export function CollectionPageView({
@@ -22,6 +23,7 @@ export function CollectionPageView({
   initialProducts = dfineCollectionProducts,
   defaultGender = 'ALL',
   initialSaleOnly = false,
+  initialCategory = 'All',
 }: CollectionPageViewProps) {
   const { openQuickView } = useDfineStore();
   const [searchParams] = useSearchParams();
@@ -34,29 +36,31 @@ export function CollectionPageView({
   const [selectedGender, setSelectedGender] = useState<'ALL' | 'MEN' | 'WOMEN' | 'UNISEX'>(defaultGender);
   const [selectedFit, setSelectedFit] = useState<string>(queryFit || 'All');
   const [selectedGsm, setSelectedGsm] = useState<number | 'All'>(queryGsm || 'All');
-  const [selectedCategory, setSelectedCategory] = useState<string>(queryCategory || 'All');
+  const [selectedCategory, setSelectedCategory] = useState<string>(queryCategory || initialCategory);
   const [selectedSort, setSelectedSort] = useState<string>('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [onlySale, setOnlySale] = useState(initialSaleOnly);
 
-  // Sync when defaultGender changes (e.g. route switch)
+  // Sync when defaultGender or initialCategory changes (e.g. route switch)
   useEffect(() => {
     setSelectedGender(defaultGender);
     setOnlySale(initialSaleOnly);
-  }, [defaultGender, initialSaleOnly]);
+    if (initialCategory) {
+      setSelectedCategory(initialCategory);
+    }
+  }, [defaultGender, initialSaleOnly, initialCategory]);
 
   const categories = [
     'All',
-    'Heavyweight Essentials',
-    'Graphic Tees',
-    'Vintage Washed',
-    'Everyday Basics',
+    'Spandex',
+    'Terry',
+    'Dye',
   ];
 
-  const fits = ['All', 'Oversized', 'Relaxed', 'Classic', 'Boxy Cropped'];
-  const gsmOptions = ['All', 180, 220, 240, 260];
-  const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+  const fits = ['All', 'Oversized', 'Relaxed'];
+  const gsmOptions = ['All', 240, 260];
+  const availableSizes = ['S', 'M', 'L', 'XL'];
 
   const filteredProducts = useMemo(() => {
     let result = [...initialProducts];
@@ -505,25 +509,38 @@ export default function CollectionPage() {
 
   let defaultGender: 'ALL' | 'MEN' | 'WOMEN' | 'UNISEX' = 'ALL';
   let initialSaleOnly = false;
+  let initialCategory = 'All';
   let title = 'All T-Shirts';
-  let subtitle = 'Everyday Essentials & Heavyweight Streetwear';
+  let subtitle = 'Spandex • French Terry • Garment Dye';
 
-  if (handle === 'men') {
+  if (handle === 'spandex') {
+    initialCategory = 'Spandex';
+    title = 'Spandex Series';
+    subtitle = 'Heavyweight Stretch & Precision Streetwear Drape';
+  } else if (handle === 'terry') {
+    initialCategory = 'Terry';
+    title = 'French Terry Series';
+    subtitle = 'Micro-Loop Knitted Premium Streetwear Drops';
+  } else if (handle === 'dye') {
+    initialCategory = 'Dye';
+    title = 'Garment Dye Series';
+    subtitle = 'Authentic Pigment-Dyed Vintage Character';
+  } else if (handle === 'men') {
     defaultGender = 'MEN';
-    title = "Men's T-Shirts";
-    subtitle = 'Heavyweight Drops, Relaxed Fits & Classic Crews';
+    title = "Men's Streetwear";
+    subtitle = 'Precision Cuts & Heavyweight Silhouettes';
   } else if (handle === 'women') {
     defaultGender = 'WOMEN';
-    title = "Women's T-Shirts";
-    subtitle = 'Boxy Cropped Cuts, Baby Tees & Boyfriend Silhouettes';
+    title = "Women's Streetwear";
+    subtitle = 'Curated Cuts & Silhouettes';
   } else if (handle === 'unisex') {
     defaultGender = 'UNISEX';
-    title = 'Unisex & Streetwear';
-    subtitle = 'Heavyweight 260 GSM Blanks & Graphic Series';
+    title = 'Unisex Streetwear';
+    subtitle = 'Spandex & French Terry Series';
   } else if (handle === 'sale') {
     initialSaleOnly = true;
     title = 'Sale Clearance';
-    subtitle = 'Discounted T-Shirt Drops';
+    subtitle = 'Limited Streetwear Drops';
   } else if (handle) {
     title = handle
       .split('-')
@@ -538,6 +555,7 @@ export default function CollectionPage() {
       initialProducts={products}
       defaultGender={defaultGender}
       initialSaleOnly={initialSaleOnly}
+      initialCategory={initialCategory}
     />
   );
 }

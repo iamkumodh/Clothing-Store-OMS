@@ -81,9 +81,13 @@ export async function fetchProductById(idOrHandle: string | number): Promise<Pro
     () => {
       let canonical = !isNaN(numId) && numId > 0 ? mockDb.getProductWithVariants(numId) : undefined;
       if (!canonical) {
-        // Fallback: match by title slug
+        // Fallback: match by title slug or product name
         const all = mockDb.getProductsWithVariants();
-        canonical = all.find(p => String(idOrHandle).includes(String(p.productId)));
+        const searchStr = String(idOrHandle).toLowerCase().replace(/[^a-z0-9]/g, '');
+        canonical = all.find(p => {
+          const pName = p.productName.toLowerCase().replace(/[^a-z0-9]/g, '');
+          return pName.includes(searchStr) || searchStr.includes(pName) || String(p.productId) === String(idOrHandle);
+        });
       }
       if (!canonical) {
         canonical = mockDb.getProductsWithVariants()[0];
