@@ -60,8 +60,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // whitelisted the Vite React development server
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        // Whitelist local Vite dev server, production custom domain, and GitHub Pages
+        configuration.setAllowedOriginPatterns(List.of(
+            "http://localhost:5173",
+            "https://d-fine.lk",
+            "https://*.d-fine.lk",
+            "https://*.github.io"
+        ));
         // allows standard REST methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));

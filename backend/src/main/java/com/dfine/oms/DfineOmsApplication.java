@@ -19,7 +19,7 @@ public class DfineOmsApplication {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173") // Your exact React URL
+                        .allowedOriginPatterns("http://localhost:5173", "https://d-fine.lk", "https://*.d-fine.lk", "https://*.github.io")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
             }
         };
